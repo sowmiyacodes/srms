@@ -1,0 +1,322 @@
+To cretae the vite:
+npm create vite@latest
+
+
+To install the package.json:
+npm init
+
+rest api 
+
+
+always I will send the user information as jwt token 
+which verifying it extarct the user details.
+
+get,post,put,delete
+
+npm install express
+npm install nodemon // automatically restart whenever the changes in server.js
+
+npm run dev // for executing the frontend and backend
+
+"Backend and frontend should run in different host"
+
+npm install dotenv // to fetch the env variable from .env
+
+
+The API call flow:
+sever.js -> router -> controller
+        <-         <-
+
+
+The things that we get from req:
+
+| Source             | Syntax                   | Example                             |
+| ------------------ | ------------------------ | ----------------------------------- |
+| Route Parameters   | `req.params`             | `/users/:id` → `req.params.id`      |
+| Query Parameters   | `req.query`              | `/search?q=apple` → `req.query.q`   |
+| Request Body       | `req.body`               | JSON data sent in POST/PUT requests |
+| Headers            | `req.headers`            | `req.headers.authorization`         |
+| Cookies            | `req.cookies`            | `req.cookies.token`                 |
+| Uploaded Files     | `req.file` / `req.files` | File upload using Multer            |
+| Session Data       | `req.session`            | Stored user session information     |
+| Authenticated User | `req.user`               | Added by authentication middleware  |
+
+
+Error code:
+
+500 : internal server Error
+200 : sucess code
+400 : Bad requests // missing field
+404 : page not found
+201 : new Resource created
+
+
+to exporting 
+export.modules = var;
+
+// middleware folder used for error handling
+
+asyc => used for make the promise for sending the response
+asychandler from express-async-handler => to throw the error automatically when the error occur
+
+In params we send id,search.
+
+
+The DB connection should be in this format:
+mongodb://localhost:27017/DB_name
+
+"mongooge" use to connect with DB.
+
+
+
+
+| Authentication                         | Authorization                                   |
+| -------------------------------------- | ----------------------------------------------- |
+| **Who are you?**                       | **What are you allowed to do?**                 |
+| Verifies the user's identity           | Verifies the user's permissions                 |
+| Happens first                          | Happens after authentication                    |
+| Example: Login with email and password | Example: Checking if the user can delete a post |
+
+
+What is a JWT Token?
+
+jwt = "userid + mail + name"
+
+JWT (JSON Web Token) is a secure way to identify a user after they log in. Instead of sending the user's email and password with every request, the server gives the client a token that proves the user's identity.
+
+Think of it like this:
+
+Login credentials (email + password) → Used once to log in.
+JWT token → Used for subsequent requests to show that the user is already authenticated.
+Real-life analogy
+
+Imagine you go to a movie theater.
+
+🎫 You buy a ticket at the counter.
+The staff checks your payment and gives you a wristband.
+After that, whenever you enter different areas, you show the wristband instead of paying again.
+
+In this analogy:
+
+Buying the ticket = Authentication (login)
+Wristband = JWT token
+Showing the wristband = Using the JWT to prove who you are
+
+
+
+All crud Operations:
+
+1. CREATE
+create()
+const issue = await Issue.create({
+    user_id: 1,
+    Title: "Login Bug",
+    problem: "Cannot login",
+    userName: "Pazhani",
+    vote: 0,
+    description: "Login page error",
+    Status: 0
+});
+
+
+2. READ
+Get all documents
+const issues = await Issue.find();
+
+Get by _id
+const issue = await Issue.findById(id);
+
+Get first matching document
+const issue = await Issue.findOne({
+    user_id: 1
+});
+
+Get all matching documents
+const issues = await Issue.find({
+    user_id: 1
+});
+
+Multiple conditions
+const issue = await Issue.findOne({
+    user_id: 1,
+    Status: 0
+});
+
+Select only some fields
+const issues = await Issue.find().select("Title problem");
+
+Exclude fields
+const issues = await Issue.find().select("-vote");
+
+Sort
+Ascending
+
+const issues = await Issue.find().sort({
+    vote: 1
+});
+
+Descending
+
+const issues = await Issue.find().sort({
+    vote: -1
+});
+
+Limit
+const issues = await Issue.find().limit(5);
+
+Skip (Pagination)
+const issues = await Issue.find()
+    .skip(10)
+    .limit(5);
+
+Count documents
+const count = await Issue.countDocuments();
+
+3. UPDATE
+Update by _id
+const updated = await Issue.findByIdAndUpdate(
+    id,
+    {
+        Title: "Updated Title"
+    },
+    {
+        new: true
+    }
+);
+
+Update by condition
+const updated = await Issue.findOneAndUpdate(
+    {
+        user_id: 1
+    },
+    {
+        Status: 1
+    },
+    {
+        new: true
+    }
+);
+
+Update many
+await Issue.updateMany(
+    {
+        Status: 0
+    },
+    {
+        Status: 1
+    }
+);
+
+Increment a value
+await Issue.findByIdAndUpdate(
+    id,
+    {
+        $inc: {
+            vote: 1
+        }
+    },
+    {
+        new: true
+    }
+);
+
+Set a field
+await Issue.updateOne(
+    {
+        user_id: 1
+    },
+    {
+        $set: {
+            Status: 1
+        }
+    }
+);
+
+4. DELETE
+
+Delete by _id
+await Issue.findByIdAndDelete(id);
+
+Delete first matching document
+await Issue.findOneAndDelete({
+    user_id: 1
+});
+
+Delete one document
+await Issue.deleteOne({
+    user_id: 1
+});
+
+Delete many documents
+await Issue.deleteMany({
+    Status: 1
+});
+
+Search Operators
+Greater than
+await Issue.find({
+    vote: { $gt: 10 }
+});
+
+Greater than or equal
+await Issue.find({
+    vote: { $gte: 10 }
+});
+
+Less than
+await Issue.find({
+    vote: { $lt: 10 }
+});
+
+Less than or equal
+await Issue.find({
+    vote: { $lte: 10 }
+});
+
+Not equal
+await Issue.find({
+    Status: { $ne: 1 }
+});
+
+In array
+await Issue.find({
+    Status: { $in: [0, 1] }
+});
+
+Regex search
+await Issue.find({
+    Title: {
+        $regex: "login",
+        $options: "i"
+    }
+});
+
+Useful helpers
+Check if document exists
+const issue = await Issue.findById(id);
+
+if (!issue) {
+    throw new Error("Issue not found");
+}
+
+Populate reference
+await Issue.find().populate("user_id");
+
+(Works when user_id is stored as an ObjectId with a ref.)
+
+Most Common Functions for Interviews & Projects
+Operation	Function
+Create	Model.create(data)
+Read all	Model.find()
+Read one	Model.findOne(filter)
+Read by _id	Model.findById(id)
+Update by _id	Model.findByIdAndUpdate(id, update, { new: true })
+Update by filter	Model.findOneAndUpdate(filter, update, { new: true })
+Increment field	Model.findByIdAndUpdate(id, { $inc: { field: 1 } })
+Delete by _id	Model.findByIdAndDelete(id)
+Delete by filter	Model.findOneAndDelete(filter)
+Delete many	Model.deleteMany(filter)
+Count	Model.countDocuments(filter)
+Sort	Model.find().sort({ field: 1 })
+Limit	Model.find().limit(n)
+Pagination	Model.find().skip(offset).limit(limit)
