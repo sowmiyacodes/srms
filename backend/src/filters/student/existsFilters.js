@@ -1,37 +1,34 @@
 /**
- * applies exists filters.
+ * Applies EXISTS based filters.
  *
- * supported filters:
- * -------------------
+ * Supported Filters
+ * -----------------
  * city
  * state
- * hasscholarship
+ * hasScholarship
  */
 
-function applyexistsfilters(query, filters) {
+function applyExistsFilters(query, params) {
 
-    const {
-        city,
-        state,
-        hasscholarship
-    } = filters;
+    //------------------------------------
+    // Permanent City
+    //------------------------------------
 
-
-    // -------------------------
-    // permanent address - city
-    // -------------------------
-
-    if (city) {
+    if (params.city) {
 
         query.whereExists(function () {
 
             this.select(1)
+
                 .from("student_address as sa")
+
                 .whereRaw("sa.studentid = s.studentid")
-                .where("sa.addresstype", "permanent")
+
+                .where("sa.addresstype", "Permanent")
+
                 .whereILike(
                     "sa.city",
-                    `%${city}%`
+                    `%${params.city}%`
                 );
 
         });
@@ -39,21 +36,25 @@ function applyexistsfilters(query, filters) {
     }
 
 
-    // -------------------------
-    // permanent address - state
-    // -------------------------
+    //------------------------------------
+    // Permanent State
+    //------------------------------------
 
-    if (state) {
+    if (params.state) {
 
         query.whereExists(function () {
 
             this.select(1)
+
                 .from("student_address as sa")
+
                 .whereRaw("sa.studentid = s.studentid")
-                .where("sa.addresstype", "permanent")
+
+                .where("sa.addresstype", "Permanent")
+
                 .whereILike(
                     "sa.state",
-                    `%${state}%`
+                    `%${params.state}%`
                 );
 
         });
@@ -61,18 +62,20 @@ function applyexistsfilters(query, filters) {
     }
 
 
-    // -------------------------
-    // scholarship exists
-    // -------------------------
+    //------------------------------------
+    // Has Scholarship
+    //------------------------------------
 
-    if (hasscholarship === "true") {
+    if (params.hasScholarship === "true") {
 
         query.whereExists(function () {
 
             this.select(1)
-                .from("student_scholarship as ss")
+
+                .from("STUDENT_SCHOLARSHIP as ss")
+
                 .whereRaw(
-                    "ss.studentid = s.studentid"
+                    "ss.StudentID = s.StudentID"
                 );
 
         });
@@ -80,29 +83,28 @@ function applyexistsfilters(query, filters) {
     }
 
 
-    // -------------------------
-    // scholarship doesn't exist
-    // -------------------------
+    //------------------------------------
+    // No Scholarship
+    //------------------------------------
 
-    if (hasscholarship === "false") {
+    if (params.hasScholarship === "false") {
 
         query.whereNotExists(function () {
 
             this.select(1)
-                .from("student_scholarship as ss")
+
+                .from("STUDENT_SCHOLARSHIP as ss")
+
                 .whereRaw(
-                    "ss.studentid = s.studentid"
+                    "ss.StudentID = s.StudentID"
                 );
 
         });
 
     }
 
-
-    return query;
 }
 
-
 module.exports = {
-    applyexistsfilters
+    applyExistsFilters,
 };

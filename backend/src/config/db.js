@@ -1,5 +1,3 @@
-// db/knex.js
-
 const knex = require("knex");
 
 const db = knex({

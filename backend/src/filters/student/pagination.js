@@ -1,27 +1,72 @@
 /**
- * applies pagination to the student query.
+ * Applies pagination to the query.
  *
- * supported query params:
- * -----------------------
+ * Query Parameters
+ * ----------------
  * page
- * pagesize
+ * pageSize
+ *
+ * Default
+ * -------
+ * page = 1
+ * pageSize = 20
+ *
+ * Maximum pageSize = 100
  */
 
-function applypagination(query, filters) {
+function applyPagination(query, params) {
 
-    const page = Number(filters.page) || 1;
-    const pagesize = Number(filters.pagesize) || 20;
+    //--------------------------------------
+    // Page
+    //--------------------------------------
 
-    const offset = (page - 1) * pagesize;
+    let page = Number(params.page) || 1;
+
+    if (page < 1) {
+        page = 1;
+    }
+
+    //--------------------------------------
+    // Page Size
+    //--------------------------------------
+
+    let pageSize = Number(params.pageSize) || 100;
+
+    if (pageSize < 1) {
+        pageSize = 20;
+    }
+
+    // Prevent huge queries
+    if (pageSize > 100) {
+        pageSize = 100;
+    }
+
+    //--------------------------------------
+    // Offset
+    //--------------------------------------
+
+    const offset = (page - 1) * pageSize;
+
+    //--------------------------------------
+    // Apply
+    //--------------------------------------
 
     query
-        .limit(pagesize)
+        .limit(pageSize)
         .offset(offset);
 
-    return query;
+    //--------------------------------------
+    // Return values
+    //--------------------------------------
+
+    return {
+        page,
+        pageSize,
+        offset
+    };
+
 }
 
-
 module.exports = {
-    applypagination
+    applyPagination,
 };

@@ -1,203 +1,152 @@
 /**
- * applies basic equality filters to the student query.
+ * Applies basic equality and multi-select filters.
  *
- * supported filters:
- * -------------------
+ * Supported Filters
+ * -----------------
  * gender
  * status
- * branchid
+ * branchId
  * degree
- * communityid
- * religionid
- * admissiontypeid
- * entrytypeid
- * bloodgroup
+ * communityId
+ * religionId
+ * admissionTypeId
+ * entryTypeId
+ * bloodGroup
  * nationality
- * ishosteller
+ * isHosteller
  */
 
-function applybasicfilters(query, filters) {
+function applyBasicFilters(query, params) {
 
-    const {
+    /**
+     * Converts comma separated values into array.
+     * Example:
+     * "1,2,3"
+     * =>
+     * ["1","2","3"]
+     */
 
-        gender,
-
-        status,
-
-        branchid,
-
-        degree,
-
-        communityid,
-
-        religionid,
-
-        admissiontypeid,
-
-        entrytypeid,
-
-        bloodgroup,
-
-        nationality,
-
-        ishosteller
-
-    } = filters;
-
-
-    // -------------------------
-    // gender
-    // -------------------------
-
-    if (gender) {
-        query.where("s.gender", gender);
-    }
-
-
-    // -------------------------
-    // status
-    // -------------------------
-
-    if (status) {
-        query.where("s.status", status);
-    }
-
-
-    // -------------------------
-    // branch
-    // -------------------------
-
-    if (branchid) {
-
-        const branchids = branchid
+    const toArray = (value) =>
+        value
             .split(",")
-            .map(Number);
+            .map(v => v.trim())
+            .filter(Boolean);
 
-        query.whereIn(
-            "s.branchid",
-            branchids
-        );
+    //-------------------------
+    // Student Filters
+    //-------------------------
+
+    if (params.gender) {
+        query.where("s.gender", params.gender);
     }
 
-
-    // -------------------------
-    // degree
-    // -------------------------
-
-    if (degree) {
-        query.where("b.degree", degree);
+    if (params.status) {
+        query.where("s.status", params.status);
     }
 
-
-    // -------------------------
-    // community
-    // -------------------------
-
-    if (communityid) {
-
-        const communityids = communityid
-            .split(",")
-            .map(Number);
-
-        query.whereIn(
-            "s.communityid",
-            communityids
-        );
-    }
-
-
-    // -------------------------
-    // religion
-    // -------------------------
-
-    if (religionid) {
-
-        const religionids = religionid
-            .split(",")
-            .map(Number);
-
-        query.whereIn(
-            "s.religionid",
-            religionids
-        );
-    }
-
-
-    // -------------------------
-    // admission type
-    // -------------------------
-
-    if (admissiontypeid) {
-
-        const admissiontypeids = admissiontypeid
-            .split(",")
-            .map(Number);
-
-        query.whereIn(
-            "s.admissiontypeid",
-            admissiontypeids
-        );
-    }
-
-
-    // -------------------------
-    // entry type
-    // -------------------------
-
-    if (entrytypeid) {
-
-        const entrytypeids = entrytypeid
-            .split(",")
-            .map(Number);
-
-        query.whereIn(
-            "s.entrytypeid",
-            entrytypeids
-        );
-    }
-
-
-    // -------------------------
-    // blood group
-    // -------------------------
-
-    if (bloodgroup) {
-        query.where(
-            "s.bloodgroup",
-            bloodgroup
-        );
-    }
-
-
-    // -------------------------
-    // nationality
-    // -------------------------
-
-    if (nationality) {
-        query.where(
-            "s.nationality",
-            nationality
-        );
-    }
-
-
-    // -------------------------
-    // hosteller
-    // -------------------------
-
-    if (ishosteller !== undefined) {
+    if (params.isHosteller !== undefined) {
 
         query.where(
             "s.ishosteller",
-            ishosteller === "true"
+            params.isHosteller === "true"
         );
+
     }
 
+    if (params.bloodGroup) {
 
-    return query;
+        query.whereIn(
+            "s.bloodgroup",
+            toArray(params.bloodGroup)
+        );
+
+    }
+
+    if (params.nationality) {
+
+        query.whereIn(
+            "s.nationality",
+            toArray(params.nationality)
+        );
+
+    }
+
+    //-------------------------
+    // Branch Filters
+    //-------------------------
+
+    if (params.branchId) {
+
+        query.whereIn(
+            "s.branchid",
+            toArray(params.branchId)
+        );
+
+    }
+
+    if (params.degree) {
+
+        query.whereIn(
+            "b.degree",
+            toArray(params.degree)
+        );
+
+    }
+
+    //-------------------------
+    // Community
+    //-------------------------
+
+    if (params.communityId) {
+
+        query.whereIn(
+            "s.communityid",
+            toArray(params.communityId)
+        );
+
+    }
+
+    //-------------------------
+    // Religion
+    //-------------------------
+
+    if (params.religionId) {
+
+        query.whereIn(
+            "s.religionid",
+            toArray(params.religionId)
+        );
+
+    }
+
+    //-------------------------
+    // Admission Type
+    //-------------------------
+
+    if (params.admissionTypeId) {
+
+        query.whereIn(
+            "s.admissiontypeid",
+            toArray(params.admissionTypeId)
+        );
+
+    }
+
+    //-------------------------
+    // Entry Type
+    //-------------------------
+
+    if (params.entryTypeId) {
+
+        query.whereIn(
+            "s.entrytypeid",
+            toArray(params.entryTypeId)
+        );
+
+    }
+
 }
 
-
 module.exports = {
-    applybasicfilters
+    applyBasicFilters,
 };

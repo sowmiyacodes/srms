@@ -1,16 +1,32 @@
 /**
- * Builds the count query for pagination.
+ * Builds the COUNT query for pagination.
  *
- * Clones the existing query (with all filters applied)
- * and converts it into a COUNT query.
+ * This function clones the filtered query and converts it
+ * into a COUNT query without affecting the original query.
+ *
+ * Returns:
+ * --------
+ * Knex Query Builder
  */
 
-function buildcountquery(query) {
+function buildCountQuery(query) {
 
     return query
         .clone()
+
+        // Remove SELECT columns
         .clearSelect()
+
+        // Remove ORDER BY
         .clearOrder()
+
+        // Remove LIMIT
+        .clear("limit")
+
+        // Remove OFFSET
+        .clear("offset")
+
+        // Count distinct students
         .countDistinct({
             totalRecords: "s.studentid"
         });
@@ -18,5 +34,5 @@ function buildcountquery(query) {
 }
 
 module.exports = {
-    buildcountquery
+    buildCountQuery,
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Routes,
   Route,
@@ -6,32 +6,34 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import LandingPage from "./Pages/LandingPage";
-import LoginPage from "./Pages/LoginPage";
-import RegisterPage from "./Pages/RegisterPage";
-import AdminDashboard from "./Pages/AdminDashboard";
-import StaffDashboard from "./Pages/StaffDashboard";
-
-import { mockCredentials, initialStudents } from "./mockData";
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import AdminDashboard from "./pages/AdminDashboard";
+import StaffDashboard from "./pages/StaffDashboard";
 
 export default function App() {
   const navigate = useNavigate();
-
   const [loginRole, setLoginRole] = useState("staff");
   const [currentUser, setCurrentUser] = useState(null);
 
-  const [students, setStudents] = useState(initialStudents);
-  const [registeredStaff, setRegisteredStaff] = useState(
-    mockCredentials.staff
-  );
+  // Restore session from localStorage on app load
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    const userStr = localStorage.getItem("user");
+    if (isLoggedIn && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setCurrentUser(user);
+      } catch (err) {
+        localStorage.clear();
+      }
+    }
+  }, []);
 
-  // ========================
-  // Navigation
-  // ========================
-
+  // Navigation handlers
   const handleSelectPortal = (role) => {
     setLoginRole(role);
-
     if (role === "staff") {
       navigate("/stafflogin");
     } else {
@@ -55,71 +57,25 @@ export default function App() {
     }
   };
 
-  // ========================
-  // Login
-  // ========================
-
-  // const handleLogin = (email, password, role) => {
-  //   if (role === "admin") {
-  //     const admin = mockCredentials.admin;
-
-  //     if (
-  //       email === admin.email &&
-  //       password === admin.password
-  //     ) {
-  //       setCurrentUser(admin);
-  //       navigate("/admindashboard");
-  //       return true;
-  //     }
-  //   } else {
-  //     const matched = registeredStaff.find(
-  //       (staff) =>
-  //         staff.email.toLowerCase() === email.toLowerCase() &&
-  //         staff.password === password
-  //     );
-
-  //     if (matched) {
-  //       setCurrentUser(matched);
-  //       navigate("/staffdashboard");
-  //       return true;
-  //     }
-  //   }
-
-  //   return false;
-  // };
-
-
+  // Login handler
   const handleLogin = (user) => {
-  setCurrentUser(user);
-
-  if (user.role === "admin") {
-    navigate("/admindashboard");
-  } else {
-    navigate("/staffdashboard");
-  }
-};
-
-  // ========================
-  // Register
-  // ========================
-
-  const handleRegister = (newStaffUser) => {
-    setRegisteredStaff((prev) => [...prev, newStaffUser]);
-
-    navigate("/stafflogin");
+    setCurrentUser(user);
+    if (user.role === "admin") {
+      navigate("/admindashboard");
+    } else {
+      navigate("/staffdashboard");
+    }
   };
 
-  // ========================
-  // Logout
-  // ========================
-
+  // Logout handler
   const handleLogout = () => {
     setCurrentUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("isLoggedIn");
     navigate("/");
   };
 
   return (
-    <>
     <Routes>
       {/* Landing Page */}
       <Route
@@ -161,7 +117,7 @@ export default function App() {
         path="/staffregister"
         element={
           <RegisterPage
-            onRegister={handleRegister}
+            onRegister={handleLogin}
             onBackToLogin={handleBackToLogin}
           />
         }
@@ -171,12 +127,14 @@ export default function App() {
       <Route
         path="/admindashboard"
         element={
-          <AdminDashboard
-            students={students}
-            setStudents={setStudents}
-            adminUser={currentUser}
-            onLogout={handleLogout}
-          />
+          currentUser?.role === "admin" ? (
+            <AdminDashboard
+              adminUser={currentUser}
+              onLogout={handleLogout}
+            />
+          ) : (
+            <Navigate to="/adminlogin" replace />
+          )
         }
       />
 
@@ -184,20 +142,22 @@ export default function App() {
       <Route
         path="/staffdashboard"
         element={
-          <StaffDashboard
-            students={students}
-            staffUser={currentUser}
-            onLogout={handleLogout}
-          />
+          currentUser && currentUser.role !== "admin" ? (
+            <StaffDashboard
+              staffUser={currentUser}
+              onLogout={handleLogout}
+            />
+          ) : (
+            <Navigate to="/stafflogin" replace />
+          )
         }
       />
 
-      {/* Unknown Route */}
+      {/* Fallback */}
       <Route
         path="*"
         element={<Navigate to="/" replace />}
       />
     </Routes>
-    </>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft, ShieldCheck, UserCheck } from 'lucide-react';
+import { authApi } from '../api/auth.api';
 
 export default function LoginPage({ role, onLogin, onBack, onGoToRegister }) {
   const [email, setEmail] = useState('');
@@ -21,50 +22,37 @@ export default function LoginPage({ role, onLogin, onBack, onGoToRegister }) {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!email || !password) {
-    setError("Please fill in all fields.");
-    return;
-  }
-
-  setLoading(true);
-  setError("");
-
-  try {
-    const response = await fetch("http://localhost:5000/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || "Login failed");
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
     }
 
-    // Store logged-in user
-    localStorage.setItem("user", JSON.stringify(data.user));
+    setLoading(true);
+    setError("");
 
-    // Store login status
-    localStorage.setItem("isLoggedIn", "true");
+    try {
+      const data = await authApi.login(email, password);
 
-    // Call parent component
-    if (onLogin) {
-      onLogin(data.user);
+      if (!data.success) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      // Store logged-in user and status
+      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("isLoggedIn", "true");
+
+      // Call parent component
+      if (onLogin) {
+        onLogin(data.user);
+      }
+    } catch (err) {
+      setError(err.message || "Unable to login.");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    setError(err.message || "Unable to login.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
@@ -75,7 +63,7 @@ export default function LoginPage({ role, onLogin, onBack, onGoToRegister }) {
 
       {/* Main Login Card Container */}
       <div className="relative z-10 w-full max-w-md bg-white rounded-2xl border border-slate-200/50 shadow-2xl overflow-hidden animate-slide-up">
-        {/* Card Header (Stark Separation: Top banner has institutional colors) */}
+        {/* Card Header */}
         <div className="bg-slate-900 px-6 py-8 text-white relative">
           <button 
             onClick={onBack}
@@ -93,7 +81,8 @@ export default function LoginPage({ role, onLogin, onBack, onGoToRegister }) {
               {role === 'admin' ? 'Administrator Login' : 'Faculty Advisor Login'}
             </h2>
             <p className="text-slate-400 text-xs mt-1.5 text-center px-4">
-  Enter your valid credentials to access your portal.            </p>
+              Enter your valid credentials to access your portal.
+            </p>
           </div>
         </div>
 
@@ -117,7 +106,7 @@ export default function LoginPage({ role, onLogin, onBack, onGoToRegister }) {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-medium animate-fade-in">
+            <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-medium animate-fade-in animate-shake">
               {error}
             </div>
           )}
@@ -181,16 +170,16 @@ export default function LoginPage({ role, onLogin, onBack, onGoToRegister }) {
 
             {/* Login Button */}
             <button
-  type="submit"
-  disabled={loading}
-  className={`w-full py-3 text-white rounded-lg font-bold text-sm shadow-md transition-all duration-300 btn-ripple ${
-    role === "admin"
-      ? "bg-brand-accent hover:bg-brand-accent-hover"
-      : "bg-blue-600 hover:bg-blue-700"
-  } ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
->
-  {loading ? "Signing In..." : "Sign In to Dashboard"}
-</button>
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3 text-white rounded-lg font-bold text-sm shadow-md transition-all duration-300 btn-ripple ${
+                role === "admin"
+                  ? "bg-brand-accent hover:bg-brand-accent-hover"
+                  : "bg-blue-600 hover:bg-blue-700"
+              } ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+            >
+              {loading ? "Signing In..." : "Sign In to Dashboard"}
+            </button>
           </form>
 
           {/* Registration link for Faculty role only */}

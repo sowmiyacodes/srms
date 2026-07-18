@@ -1,70 +1,93 @@
 /**
- * applies date range filters.
+ * Applies all date range filters.
  *
- * supported filters:
- * -------------------
- * dobfrom
- * dobto
- * joiningfrom
- * joiningto
+ * Supported Filters
+ * -----------------
+ * dobFrom
+ * dobTo
+ *
+ * joiningFrom
+ * joiningTo
  */
 
-function applyrangefilters(query, filters) {
+function applyRangeFilters(query, params) {
 
-    const {
-        dobfrom,
-        dobto,
-        joiningfrom,
-        joiningto
-    } = filters;
+    //-----------------------------
+    // Date of Birth
+    //-----------------------------
 
+    if (params.dobFrom && params.dobTo) {
 
-    // -------------------------
-    // dob range
-    // -------------------------
-
-    if (dobfrom) {
-        query.where(
+        query.whereBetween(
             "s.dob",
-            ">=",
-            dobfrom
+            [params.dobFrom, params.dobTo]
         );
+
+    } else {
+
+        if (params.dobFrom) {
+
+            query.where(
+                "s.dob",
+                ">=",
+                params.dobFrom
+            );
+
+        }
+
+        if (params.dobTo) {
+
+            query.where(
+                "s.dob",
+                "<=",
+                params.dobTo
+            );
+
+        }
+
     }
 
-    if (dobto) {
-        query.where(
-            "s.dob",
-            "<=",
-            dobto
-        );
-    }
 
+    //-----------------------------
+    // Date of Joining
+    //-----------------------------
 
-    // -------------------------
-    // joining date range
-    // -------------------------
+    if (params.joiningFrom && params.joiningTo) {
 
-    if (joiningfrom) {
-        query.where(
+        query.whereBetween(
             "s.dateofjoining",
-            ">=",
-            joiningfrom
+            [
+                params.joiningFrom,
+                params.joiningTo
+            ]
         );
+
+    } else {
+
+        if (params.joiningFrom) {
+
+            query.where(
+                "s.dateofjoining",
+                ">=",
+                params.joiningFrom
+            );
+
+        }
+
+        if (params.joiningTo) {
+
+            query.where(
+                "s.dateofjoining",
+                "<=",
+                params.joiningTo
+            );
+
+        }
+
     }
 
-    if (joiningto) {
-        query.where(
-            "s.dateofjoining",
-            "<=",
-            joiningto
-        );
-    }
-
-
-    return query;
 }
 
-
 module.exports = {
-    applyrangefilters
+    applyRangeFilters,
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Building, ArrowLeft } from 'lucide-react';
+import { authApi } from '../api/auth.api';
 
 export default function RegisterPage({ onRegister, onBackToLogin }) {
   const [name, setName] = useState('');
@@ -12,61 +13,56 @@ export default function RegisterPage({ onRegister, onBackToLogin }) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!name || !email || !password || !confirmPassword) {
-    setError("Please fill in all fields.");
-    return;
-  }
+    if (!name || !email || !password || !confirmPassword) {
+      setError("Please fill in all fields.");
+      return;
+    }
 
-  if (password !== confirmPassword) {
-    setError("Passwords do not match.");
-    return;
-  }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
 
-  if (password.length < 6) {
-    setError("Password must be at least 6 characters.");
-    return;
-  }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
 
-  setError("");
-  setLoading(true);
-  try {
-    const response = await fetch("http://localhost:5000/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    setError("");
+    setLoading(true);
+
+    try {
+      const data = await authApi.register({
         full_name: name,
         email: email,
         department: department,
         password: password,
-      }),
-    });
+      });
 
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-      throw new Error(data.message || "Registration failed");
-    }
-
-    setSuccess(true);
-
-    // Optional: Redirect back to login after 2 seconds
-    setTimeout(() => {
-      if (onBackToLogin) {
-        onBackToLogin();
+      if (!data.success) {
+        throw new Error(data.message || "Registration failed");
       }
-    }, 2000);
 
-  } catch (err) {
-    setError(err.message || "Something went wrong.");
-  }
-  finally{
-    setLoading(false);
-  }
-};
+      setSuccess(true);
+
+      if (onRegister) {
+        onRegister(data.user);
+      }
+
+      setTimeout(() => {
+        if (onBackToLogin) {
+          onBackToLogin();
+        }
+      }, 2000);
+
+    } catch (err) {
+      setError(err.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (success) {
     return (
@@ -123,7 +119,7 @@ export default function RegisterPage({ onRegister, onBackToLogin }) {
         {/* Card Body */}
         <div className="p-8 bg-slate-50">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-medium animate-fade-in">
+            <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-medium animate-fade-in animate-shake">
               {error}
             </div>
           )}

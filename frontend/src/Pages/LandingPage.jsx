@@ -11,7 +11,7 @@ export default function LandingPage({ onSelectPortal }) {
       <div className="absolute top-[20%] left-[15%] w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
       <div className="absolute bottom-[20%] right-[15%] w-96 h-96 bg-brand-accent/5 rounded-full blur-3xl animate-pulse-slow"></div>
 
-      {/* Global Institutional Header - Stark Institutional White Branding */}
+      {/* Global Institutional Header */}
       <header className="relative z-10 w-full px-6 py-5 bg-slate-950/60 backdrop-blur-md border-b border-slate-800 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-brand-accent rounded-lg shadow-lg animate-float">
@@ -51,7 +51,7 @@ export default function LandingPage({ onSelectPortal }) {
               <h3 className="text-2xl font-bold text-white mb-2">Faculty Advisor Portal</h3>
               <p className="text-slate-300 text-sm leading-relaxed mb-6">
                 For Staff, Faculty Advisors, and Tutors.
-                </p>
+              </p>
             </div>
             <div className="flex items-center text-blue-400 group-hover:text-blue-300 text-sm font-semibold gap-1">
               <span>Access Advisory Panel</span>

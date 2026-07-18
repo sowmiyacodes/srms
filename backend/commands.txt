@@ -1,0 +1,16 @@
+Supported Query Parameters
+
+Your frontend can now call:
+
+GET /students?gender=Female
+GET /students?status=Active
+GET /students?branchId=1
+GET /students?branchId=1,2,5
+GET /students?communityId=3
+GET /students?religionId=2
+GET /students?bloodGroup=O+
+GET /students?isHosteller=true
+GET /students?nationality=Indian
+
+
+GET /students?branchId=2,5&gender=Female&status=Active

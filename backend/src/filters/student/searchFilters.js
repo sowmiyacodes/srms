@@ -1,59 +1,39 @@
 /**
- * applies global search to student listing.
+ * Applies global search filter.
  *
- * searches across:
- * - reg no
- * - name
- * - mobile no
- * - email
- * - branch name
+ * Searches across:
+ * - Reg No
+ * - Student Name
+ * - Mobile No
+ * - Email ID
+ * - Branch Name
  */
 
-function applysearchfilter(query, filters) {
+function applySearchFilter(query, params) {
 
-    const { search } = filters;
-
-    if (!search) {
-        return query;
+    // Nothing to search
+    if (!params.search || params.search.trim() === "") {
+        return;
     }
 
-    const keyword = `%${search}%`;
-
+    const keyword = `%${params.search.trim()}%`;
 
     query.andWhere(function () {
 
-        this.whereILike(
-                "s.regno",
-                keyword
-            )
+        this.whereILike("s.regno", keyword)
 
-            .orWhereILike(
-                "s.name",
-                keyword
-            )
+            .orWhereILike("s.name", keyword)
 
-            .orWhereILike(
-                "s.mobileno",
-                keyword
-            )
+            .orWhereILike("s.mobileno", keyword)
 
-            .orWhereILike(
-                "s.emailid",
-                keyword
-            )
+            .orWhereILike("s.emailid", keyword)
 
-            .orWhereILike(
-                "b.branchname",
-                keyword
-            );
+            .orWhereILike("b.branchname", keyword);
 
     });
 
-
-    return query;
 }
 
-
 module.exports = {
-    applysearchfilter
+    applySearchFilter,
 };

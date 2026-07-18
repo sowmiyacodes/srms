@@ -1,37 +1,122 @@
-const { applybasicfilters } = require("../../filters/student/basicfilters");
-const { createbasequery } = require("../../filters/student/basequery");
-const { applyexistsfilters } = require("../../filters/student/existsfilters");
-const { applypagination } = require("../../filters/student/pagination");
-const { applyrangefilters } = require("../../filters/student/rangefilters");
-const { applysearchfilter } = require("../../filters/student/searchfilters");
-const { applysorting } = require("../../filters/student/sorting");
-const { buildcountquery } = require("../../filters/student/countquery");
+const { createBaseQuery } = require("../../filters/student/baseQuery");
 
-async function getStudentList(filters) {
+const { applyBasicFilters } = require("../../filters/student/basicFilters");
 
-    const query = createbasequery();
+const { applySearchFilter } = require("../../filters/student/searchFilters");
 
-    applybasicfilters(query, filters);
-    applysearchfilter(query, filters);
-    applyrangefilters(query, filters);
-    applyexistsfilters(query, filters);
+const { applyRangeFilters } = require("../../filters/student/rangeFilters");
 
-    const countquery = buildcountquery(query);
+const { applyExistsFilters } = require("../../filters/student/existsFilters");
 
-    applysorting(query, filters);
-    applypagination(query, filters);
+const { applySorting } = require("../../filters/student/sorting");
 
-    const [students, countresult] = await Promise.all([
+const { applyPagination } = require("../../filters/student/pagination");
+
+const { buildCountQuery } = require("../../filters/student/countQuery");
+
+/**
+ * Builds and executes the Student Listing query.
+ *
+ * Returns
+ * -------
+ * {
+ *   data: [],
+ *   meta: {}
+ * }
+ */
+
+async function getStudentList(params) {
+
+    //------------------------------------------------
+    // Create Base Query
+    //------------------------------------------------
+
+    const query = createBaseQuery();
+
+    //------------------------------------------------
+    // Apply Filters
+    //------------------------------------------------
+
+    applyBasicFilters(query, params);
+
+    applySearchFilter(query, params);
+
+    applyRangeFilters(query, params);
+
+    applyExistsFilters(query, params);
+
+    //------------------------------------------------
+    // Count Query
+    //------------------------------------------------
+
+    const countQuery = buildCountQuery(query);
+
+    //------------------------------------------------
+    // Sorting
+    //------------------------------------------------
+
+    applySorting(query, params);
+
+    //------------------------------------------------
+    // Pagination
+    //------------------------------------------------
+
+    const pagination = applyPagination(query, params);
+
+    //------------------------------------------------
+    // Execute Queries
+    //------------------------------------------------
+
+    const [students, totalResult] = await Promise.all([
+
         query,
-        countquery
+
+        countQuery
+
     ]);
 
+    //------------------------------------------------
+    // Total Records
+    //------------------------------------------------
+
+    const totalRecords = Number(
+        totalResult[0].totalRecords
+    );
+
+    //------------------------------------------------
+    // Total Pages
+    //------------------------------------------------
+
+    const totalPages = Math.ceil(
+        totalRecords / pagination.pageSize
+    );
+
+    //------------------------------------------------
+    // Response
+    //------------------------------------------------
+
     return {
+
         data: students,
-        totalrecords: Number(countresult[0].totalrecords)
+
+        meta: {
+
+            page: pagination.page,
+
+            pageSize: pagination.pageSize,
+
+            totalRecords,
+
+            totalPages
+
+        }
+
     };
+
 }
 
 module.exports = {
+
     getStudentList
+
 };

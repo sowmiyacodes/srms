@@ -1,17 +1,17 @@
 /**
- * allowed sorting columns for student listing screen.
+ * Allowed sorting columns for Student Listing Screen.
  *
- * key   -> value received from frontend
- * value -> actual postgresql column
+ * Key   -> value received from frontend
+ * Value -> actual PostgreSQL column
  */
 
-const sortablecolumns = {
+const sortableColumns = {
 
-    // student table
+    // Student Table
 
-    studentid: "s.studentid",
+    studentId: "s.studentid",
 
-    regno: "s.regno",
+    regNo: "s.regno",
 
     name: "s.name",
 
@@ -19,47 +19,52 @@ const sortablecolumns = {
 
     dob: "s.dob",
 
-    mobileno: "s.mobileno",
+    mobileNo: "s.mobileno",
 
     email: "s.emailid",
 
-    joiningdate: "s.dateofjoining",
+    joiningDate: "s.dateofjoining",
 
     status: "s.status",
 
-    bloodgroup: "s.bloodgroup",
+    bloodGroup: "s.bloodgroup",
 
     nationality: "s.nationality",
 
-    ishosteller: "s.ishosteller",
+    isHosteller: "s.ishosteller",
 
 
-    // branch
+
+    // Branch
 
     branch: "b.branchname",
 
     degree: "b.degree",
 
 
-    // community
+
+    // Community
 
     community: "c.communityname",
 
 
-    // religion
+
+    // Religion
 
     religion: "r.religionname",
 
 
-    // admission type
 
-    admissiontype: "at.admissiontypename",
+    // Admission Type
+
+    admissionType: "at.admissiontypename",
 
 
-    // entry type
 
-    entrytype: "et.entrytypename"
+    // Entry Type
+
+    entryType: "et.entrytypename"
 
 };
 
-module.exports = sortablecolumns;
+module.exports = sortableColumns;

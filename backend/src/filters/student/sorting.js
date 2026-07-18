@@ -1,53 +1,48 @@
+const sortableColumns = require("../../constants/sortableColumns");
+
 /**
- * applies sorting to the student query.
+ * Applies sorting to the student list query.
  *
- * supported query params:
- * -----------------------
- * sortby
- * sortorder
+ * Query Params
+ * ------------
+ * sortBy
+ * sortOrder
+ *
+ * Example
+ * --------
+ * ?sortBy=name&sortOrder=asc
  */
 
-const sortablecolumns = require("../../constants/sortablecolumns");
+function applySorting(query, params) {
 
+    //--------------------------------------
+    // Default Values
+    //--------------------------------------
 
-function applysorting(query, filters) {
+    const sortBy = params.sortBy || "name";
 
-    const {
-        sortby = "name",
-        sortorder = "asc"
-    } = filters;
-
-
-    // get actual database column
-    const column = sortablecolumns[sortby];
-
-
-    // ignore invalid sort column
-    if (!column) {
-        return query.orderBy(
-            "s.name",
-            "asc"
-        );
-    }
-
-
-    // only allow asc or desc
-    const order =
-        sortorder.toLowerCase() === "desc"
+    const sortOrder =
+        params.sortOrder &&
+        params.sortOrder.toLowerCase() === "desc"
             ? "desc"
             : "asc";
 
+    //--------------------------------------
+    // Validate Column
+    //--------------------------------------
 
-    query.orderBy(
-        column,
-        order
-    );
+    const column =
+        sortableColumns[sortBy] ||
+        sortableColumns.name;
 
+    //--------------------------------------
+    // Apply ORDER BY
+    //--------------------------------------
 
-    return query;
+    query.orderBy(column, sortOrder);
+
 }
 
-
 module.exports = {
-    applysorting
+    applySorting,
 };
