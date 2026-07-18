@@ -1,71 +1,35 @@
-const { createBaseQuery } = require("../../filters/student/baseQuery");
-const { applyBasicFilters } = require("../../filters/student/basicFilters");
-const { applySearchFilter } = require("../../filters/student/searchFilters");
-const { applyRangeFilters } = require("../../filters/student/rangeFilters");
-const { applyExistsFilters } = require("../../filters/student/existsFilters");
-const { applySorting } = require("../../filters/student/sorting");
-const { applyPagination } = require("../../filters/student/pagination");
-const { buildCountQuery } = require("../../filters/student/countQuery");
-
-/**
- * Builds and executes Student Listing Query
- */
+const { applybasicfilters } = require("../../filters/student/basicfilters");
+const { createbasequery } = require("../../filters/student/basequery");
+const { applyexistsfilters } = require("../../filters/student/existsfilters");
+const { applypagination } = require("../../filters/student/pagination");
+const { applyrangefilters } = require("../../filters/student/rangefilters");
+const { applysearchfilter } = require("../../filters/student/searchfilters");
+const { applysorting } = require("../../filters/student/sorting");
+const { buildcountquery } = require("../../filters/student/countquery");
 
 async function getStudentList(filters) {
 
-    // -------------------------
-    // Base Query
-    // -------------------------
+    const query = createbasequery();
 
-    const query = createBaseQuery();
+    applybasicfilters(query, filters);
+    applysearchfilter(query, filters);
+    applyrangefilters(query, filters);
+    applyexistsfilters(query, filters);
 
-    // -------------------------
-    // Apply Filters
-    // -------------------------
+    const countquery = buildcountquery(query);
 
-    applyBasicFilters(query, filters);
+    applysorting(query, filters);
+    applypagination(query, filters);
 
-    applySearchFilter(query, filters);
-
-    applyRangeFilters(query, filters);
-
-    applyExistsFilters(query, filters);
-
-    // -------------------------
-    // Build Count Query
-    // -------------------------
-
-    const countQuery = buildCountQuery(query);
-
-    // -------------------------
-    // Apply Sorting
-    // -------------------------
-
-    applySorting(query, filters);
-
-    // -------------------------
-    // Apply Pagination
-    // -------------------------
-
-    applyPagination(query, filters);
-
-    // -------------------------
-    // Execute Queries
-    // -------------------------
-
-    const [students, countResult] = await Promise.all([
+    const [students, countresult] = await Promise.all([
         query,
-        countQuery
+        countquery
     ]);
 
     return {
-
         data: students,
-
-        totalRecords: Number(countResult[0].totalRecords)
-
+        totalrecords: Number(countresult[0].totalrecords)
     };
-
 }
 
 module.exports = {

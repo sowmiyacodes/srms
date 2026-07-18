@@ -1,22 +1,22 @@
 /**
- * Applies basic equality filters to the student query.
+ * applies basic equality filters to the student query.
  *
- * Supported Filters:
+ * supported filters:
  * -------------------
  * gender
  * status
- * branchId
+ * branchid
  * degree
- * communityId
- * religionId
- * admissionTypeId
- * entryTypeId
- * bloodGroup
+ * communityid
+ * religionid
+ * admissiontypeid
+ * entrytypeid
+ * bloodgroup
  * nationality
- * isHosteller
+ * ishosteller
  */
 
-function applyBasicFilters(query, filters) {
+function applybasicfilters(query, filters) {
 
     const {
 
@@ -24,161 +24,180 @@ function applyBasicFilters(query, filters) {
 
         status,
 
-        branchId,
+        branchid,
 
         degree,
 
-        communityId,
+        communityid,
 
-        religionId,
+        religionid,
 
-        admissionTypeId,
+        admissiontypeid,
 
-        entryTypeId,
+        entrytypeid,
 
-        bloodGroup,
+        bloodgroup,
 
         nationality,
 
-        isHosteller
+        ishosteller
 
     } = filters;
 
+
     // -------------------------
-    // Gender
+    // gender
     // -------------------------
 
     if (gender) {
-        query.where("s.Gender", gender);
+        query.where("s.gender", gender);
     }
 
+
     // -------------------------
-    // Status
+    // status
     // -------------------------
 
     if (status) {
-        query.where("s.Status", status);
+        query.where("s.status", status);
     }
 
+
     // -------------------------
-    // Branch
+    // branch
     // -------------------------
 
-    if (branchId) {
+    if (branchid) {
 
-        const branchIds = branchId
+        const branchids = branchid
             .split(",")
             .map(Number);
 
         query.whereIn(
-            "s.BranchID",
-            branchIds
+            "s.branchid",
+            branchids
         );
     }
 
+
     // -------------------------
-    // Degree
+    // degree
     // -------------------------
 
     if (degree) {
-        query.where("b.Degree", degree);
+        query.where("b.degree", degree);
     }
 
+
     // -------------------------
-    // Community
+    // community
     // -------------------------
 
-    if (communityId) {
+    if (communityid) {
 
-        const communityIds = communityId
+        const communityids = communityid
             .split(",")
             .map(Number);
 
         query.whereIn(
-            "s.CommunityID",
-            communityIds
+            "s.communityid",
+            communityids
         );
     }
 
+
     // -------------------------
-    // Religion
+    // religion
     // -------------------------
 
-    if (religionId) {
+    if (religionid) {
 
-        const religionIds = religionId
+        const religionids = religionid
             .split(",")
             .map(Number);
 
         query.whereIn(
-            "s.ReligionID",
-            religionIds
+            "s.religionid",
+            religionids
         );
     }
 
+
     // -------------------------
-    // Admission Type
+    // admission type
     // -------------------------
 
-    if (admissionTypeId) {
+    if (admissiontypeid) {
 
-        const admissionIds = admissionTypeId
+        const admissiontypeids = admissiontypeid
             .split(",")
             .map(Number);
 
         query.whereIn(
-            "s.AdmissionTypeID",
-            admissionIds
+            "s.admissiontypeid",
+            admissiontypeids
         );
     }
 
+
     // -------------------------
-    // Entry Type
+    // entry type
     // -------------------------
 
-    if (entryTypeId) {
+    if (entrytypeid) {
 
-        const entryTypeIds = entryTypeId
+        const entrytypeids = entrytypeid
             .split(",")
             .map(Number);
 
         query.whereIn(
-            "s.EntryTypeID",
-            entryTypeIds
+            "s.entrytypeid",
+            entrytypeids
         );
     }
 
+
     // -------------------------
-    // Blood Group
+    // blood group
     // -------------------------
 
-    if (bloodGroup) {
-        query.where("s.BloodGroup", bloodGroup);
+    if (bloodgroup) {
+        query.where(
+            "s.bloodgroup",
+            bloodgroup
+        );
     }
 
+
     // -------------------------
-    // Nationality
+    // nationality
     // -------------------------
 
     if (nationality) {
-        query.where("s.Nationality", nationality);
-    }
-
-    // -------------------------
-    // Hosteller
-    // -------------------------
-
-    if (isHosteller !== undefined) {
-
         query.where(
-            "s.IsHosteller",
-            isHosteller === "true"
+            "s.nationality",
+            nationality
         );
     }
+
+
+    // -------------------------
+    // hosteller
+    // -------------------------
+
+    if (ishosteller !== undefined) {
+
+        query.where(
+            "s.ishosteller",
+            ishosteller === "true"
+        );
+    }
+
 
     return query;
 }
 
+
 module.exports = {
-    applyBasicFilters
+    applybasicfilters
 };

@@ -5,18 +5,18 @@
  * and converts it into a COUNT query.
  */
 
-function buildCountQuery(query) {
+function buildcountquery(query) {
 
     return query
         .clone()
         .clearSelect()
         .clearOrder()
         .countDistinct({
-            totalRecords: "s.StudentID"
+            totalRecords: "s.studentid"
         });
 
 }
 
 module.exports = {
-    buildCountQuery
+    buildcountquery
 };

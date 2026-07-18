@@ -1,40 +1,53 @@
-const sortableColumns = require("../../constants/sortableColumns");
-
 /**
- * Applies sorting to the student query.
+ * applies sorting to the student query.
  *
- * Supported Query Params:
+ * supported query params:
  * -----------------------
- * sortBy
- * sortOrder
+ * sortby
+ * sortorder
  */
 
-function applySorting(query, filters) {
+const sortablecolumns = require("../../constants/sortablecolumns");
+
+
+function applysorting(query, filters) {
 
     const {
-        sortBy = "name",
-        sortOrder = "asc"
+        sortby = "name",
+        sortorder = "asc"
     } = filters;
 
-    // Get actual database column
-    const column = sortableColumns[sortBy];
 
-    // Ignore invalid sort column
+    // get actual database column
+    const column = sortablecolumns[sortby];
+
+
+    // ignore invalid sort column
     if (!column) {
-        return query.orderBy("s.Name", "asc");
+        return query.orderBy(
+            "s.name",
+            "asc"
+        );
     }
 
-    // Only allow asc or desc
+
+    // only allow asc or desc
     const order =
-        sortOrder.toLowerCase() === "desc"
+        sortorder.toLowerCase() === "desc"
             ? "desc"
             : "asc";
 
-    query.orderBy(column, order);
+
+    query.orderBy(
+        column,
+        order
+    );
+
 
     return query;
 }
 
+
 module.exports = {
-    applySorting
+    applysorting
 };

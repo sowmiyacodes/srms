@@ -1,15 +1,15 @@
 /**
- * Applies global search to Student Listing.
+ * applies global search to student listing.
  *
- * Searches across:
- * - Reg No
- * - Name
- * - Mobile No
- * - Email
- * - Branch Name
+ * searches across:
+ * - reg no
+ * - name
+ * - mobile no
+ * - email
+ * - branch name
  */
 
-function applySearchFilter(query, filters) {
+function applysearchfilter(query, filters) {
 
     const { search } = filters;
 
@@ -19,23 +19,41 @@ function applySearchFilter(query, filters) {
 
     const keyword = `%${search}%`;
 
+
     query.andWhere(function () {
 
-        this.whereILike("s.RegNo", keyword)
+        this.whereILike(
+                "s.regno",
+                keyword
+            )
 
-            .orWhereILike("s.Name", keyword)
+            .orWhereILike(
+                "s.name",
+                keyword
+            )
 
-            .orWhereILike("s.MobileNo", keyword)
+            .orWhereILike(
+                "s.mobileno",
+                keyword
+            )
 
-            .orWhereILike("s.EmailID", keyword)
+            .orWhereILike(
+                "s.emailid",
+                keyword
+            )
 
-            .orWhereILike("b.BranchName", keyword);
+            .orWhereILike(
+                "b.branchname",
+                keyword
+            );
 
     });
+
 
     return query;
 }
 
+
 module.exports = {
-    applySearchFilter
+    applysearchfilter
 };

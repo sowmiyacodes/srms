@@ -2,51 +2,43 @@ const knex = require("../../config/db");
 
 /**
  * Creates the base query for Student Listing Screen.
- *
- * Includes:
- * - Base STUDENT table
- * - Required lookup table joins
- * - Columns required by frontend
- *
- * Returns:
- * Knex Query Builder
  */
 
-function createBaseQuery() {
-    return knex("STUDENT as s")
+function createbasequery() {
+    return knex("student as s")
 
         // ===========================
         // Lookup Table Joins
         // ===========================
 
         .leftJoin(
-            "BRANCH as b",
-            "s.BranchID",
-            "b.BranchID"
+            "branch as b",
+            "s.branchid",
+            "b.branchid"
         )
 
         .leftJoin(
-            "COMMUNITY as c",
-            "s.CommunityID",
-            "c.CommunityID"
+            "community as c",
+            "s.communityid",
+            "c.communityid"
         )
 
         .leftJoin(
-            "RELIGION as r",
-            "s.ReligionID",
-            "r.ReligionID"
+            "religion as r",
+            "s.religionid",
+            "r.religionid"
         )
 
         .leftJoin(
-            "ADMISSION_TYPE as at",
-            "s.AdmissionTypeID",
-            "at.AdmissionTypeID"
+            "admission_type as at",
+            "s.admissiontypeid",
+            "at.admissiontypeid"
         )
 
         .leftJoin(
-            "STUDENT_ENTRY_TYPE as et",
-            "s.EntryTypeID",
-            "et.EntryTypeID"
+            "student_entry_type as et",
+            "s.entrytypeid",
+            "et.entrytypeid"
         )
 
         // ===========================
@@ -57,67 +49,47 @@ function createBaseQuery() {
 
             // Student
 
-            "s.StudentID",
-
-            "s.RegNo",
-
-            "s.Name",
-
-            "s.Photo",
-
-            "s.Gender",
-
-            "s.DOB",
-
-            "s.MobileNo",
-
-            "s.EmailID",
-
-            "s.DateOfJoining",
-
-            "s.Status",
-
-            "s.BloodGroup",
-
-            "s.IsHosteller",
-
-            "s.Nationality",
+            "s.studentid",
+            "s.regno",
+            "s.name",
+            "s.gender",
+            "s.dob",
+            "s.mobileno",
+            "s.emailid",
+            "s.dateofjoining",
+            "s.status",
+            "s.bloodgroup",
+            "s.ishosteller",
+            "s.nationality",
 
             // Branch
 
-            "b.BranchID",
-
-            "b.BranchName",
-
-            "b.Degree",
+            "b.branchid",
+            "b.branchname",
+            "b.degree",
 
             // Community
 
-            "c.CommunityID",
-
-            "c.CommunityName",
+            "c.communityid",
+            "c.communityname",
 
             // Religion
 
-            "r.ReligionID",
-
-            "r.ReligionName",
+            "r.religionid",
+            "r.religionname",
 
             // Admission Type
 
-            "at.AdmissionTypeID",
-
-            "at.AdmissionTypeName",
+            "at.admissiontypeid",
+            "at.admissiontypename",
 
             // Entry Type
 
-            "et.EntryTypeID",
-
-            "et.EntryTypeName"
-
+            "et.entrytypeid",
+            "et.entrytypename"
         );
 }
 
 module.exports = {
-    createBaseQuery
+    createbasequery
 };

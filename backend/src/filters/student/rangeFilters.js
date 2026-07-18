@@ -1,50 +1,70 @@
 /**
- * Applies date range filters.
+ * applies date range filters.
  *
- * Supported Filters:
+ * supported filters:
  * -------------------
- * dobFrom
- * dobTo
- * joiningFrom
- * joiningTo
+ * dobfrom
+ * dobto
+ * joiningfrom
+ * joiningto
  */
 
-function applyRangeFilters(query, filters) {
+function applyrangefilters(query, filters) {
 
     const {
-        dobFrom,
-        dobTo,
-        joiningFrom,
-        joiningTo
+        dobfrom,
+        dobto,
+        joiningfrom,
+        joiningto
     } = filters;
 
-    // -------------------------
-    // DOB Range
-    // -------------------------
-
-    if (dobFrom) {
-        query.where("s.DOB", ">=", dobFrom);
-    }
-
-    if (dobTo) {
-        query.where("s.DOB", "<=", dobTo);
-    }
 
     // -------------------------
-    // Joining Date Range
+    // dob range
     // -------------------------
 
-    if (joiningFrom) {
-        query.where("s.DateOfJoining", ">=", joiningFrom);
+    if (dobfrom) {
+        query.where(
+            "s.dob",
+            ">=",
+            dobfrom
+        );
     }
 
-    if (joiningTo) {
-        query.where("s.DateOfJoining", "<=", joiningTo);
+    if (dobto) {
+        query.where(
+            "s.dob",
+            "<=",
+            dobto
+        );
     }
+
+
+    // -------------------------
+    // joining date range
+    // -------------------------
+
+    if (joiningfrom) {
+        query.where(
+            "s.dateofjoining",
+            ">=",
+            joiningfrom
+        );
+    }
+
+    if (joiningto) {
+        query.where(
+            "s.dateofjoining",
+            "<=",
+            joiningto
+        );
+    }
+
 
     return query;
 }
 
+
 module.exports = {
-    applyRangeFilters
+    applyrangefilters
 };

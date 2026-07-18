@@ -1,70 +1,65 @@
 /**
- * Allowed sorting columns for Student Listing Screen.
+ * allowed sorting columns for student listing screen.
  *
- * Key   -> value received from frontend
- * Value -> actual PostgreSQL column
+ * key   -> value received from frontend
+ * value -> actual postgresql column
  */
 
-const sortableColumns = {
+const sortablecolumns = {
 
-    // Student Table
+    // student table
 
-    studentId: "s.StudentID",
+    studentid: "s.studentid",
 
-    regNo: "s.RegNo",
+    regno: "s.regno",
 
-    name: "s.Name",
+    name: "s.name",
 
-    gender: "s.Gender",
+    gender: "s.gender",
 
-    dob: "s.DOB",
+    dob: "s.dob",
 
-    mobileNo: "s.MobileNo",
+    mobileno: "s.mobileno",
 
-    email: "s.EmailID",
+    email: "s.emailid",
 
-    joiningDate: "s.DateOfJoining",
+    joiningdate: "s.dateofjoining",
 
-    status: "s.Status",
+    status: "s.status",
 
-    bloodGroup: "s.BloodGroup",
+    bloodgroup: "s.bloodgroup",
 
-    nationality: "s.Nationality",
+    nationality: "s.nationality",
 
-    isHosteller: "s.IsHosteller",
-
-
-
-    // Branch
-
-    branch: "b.BranchName",
-
-    degree: "b.Degree",
+    ishosteller: "s.ishosteller",
 
 
+    // branch
 
-    // Community
+    branch: "b.branchname",
 
-    community: "c.CommunityName",
-
-
-
-    // Religion
-
-    religion: "r.ReligionName",
+    degree: "b.degree",
 
 
+    // community
 
-    // Admission Type
-
-    admissionType: "at.AdmissionTypeName",
-
+    community: "c.communityname",
 
 
-    // Entry Type
+    // religion
 
-    entryType: "et.EntryTypeName"
+    religion: "r.religionname",
+
+
+    // admission type
+
+    admissiontype: "at.admissiontypename",
+
+
+    // entry type
+
+    entrytype: "et.entrytypename"
 
 };
 
-module.exports = sortableColumns;
+module.exports = sortablecolumns;
