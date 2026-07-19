@@ -10,7 +10,7 @@ export default function DashboardHeader({ user, onLogout }) {
         </div>
         <div>
           <h1 className="text-lg font-bold tracking-tight text-white m-0 leading-none">
-            Anna University Admin Portal
+            Anna University {user?.role?.charAt(0).toUpperCase()+user.role?.slice(1)} Portal
           </h1>
           <p className="text-xs text-slate-400 mt-1 font-semibold">
             Authorized User: {user?.full_name || 'Admin'} ({user?.role || 'Administrator'})

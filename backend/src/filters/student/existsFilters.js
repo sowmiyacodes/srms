@@ -72,10 +72,10 @@ function applyExistsFilters(query, params) {
 
             this.select(1)
 
-                .from("STUDENT_SCHOLARSHIP as ss")
+                .from("student_scholarship as ss")
 
                 .whereRaw(
-                    "ss.StudentID = s.StudentID"
+                    "ss.studentid = s.studentid"
                 );
 
         });
@@ -93,10 +93,10 @@ function applyExistsFilters(query, params) {
 
             this.select(1)
 
-                .from("STUDENT_SCHOLARSHIP as ss")
+                .from("student_scholarship as ss")
 
                 .whereRaw(
-                    "ss.StudentID = s.StudentID"
+                    "ss.studentid = s.studentid"
                 );
 
         });
