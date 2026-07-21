@@ -111,7 +111,7 @@ export default function AdminDashboard({ adminUser, onLogout }) {
 
       const studentList = data.data || [];
       setStudents(studentList);
-      setTotalRecords(data.pagination?.total || 0);
+      setTotalRecords(data.meta?.totalRecords || 0);
       setTotalPages(data.pagination?.totalPages || 1);
 
       // Compute simple stats from the page data (full stats come from pagination.total)
