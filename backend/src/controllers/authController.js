@@ -39,7 +39,7 @@ exports.register = async (req, res) => {
                 {
                     full_name,
                     email,
-                    department,
+                    
                     password: hashedPassword,
                     role: "faculty"
                 }
@@ -125,7 +125,7 @@ exports.login = async (req, res) => {
 
                 email: data.email,
 
-                department: data.department,
+                
 
                 role: data.role
 

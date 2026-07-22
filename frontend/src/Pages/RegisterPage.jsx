@@ -5,7 +5,7 @@ import { authApi } from '../api/auth.api';
 export default function RegisterPage({ onRegister, onBackToLogin }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [department, setDepartment] = useState('IT');
+ // const [department, setDepartment] = useState('IT');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -165,7 +165,7 @@ export default function RegisterPage({ onRegister, onBackToLogin }) {
               </div>
             </div>
 
-            {/* Department Selector */}
+            {/* Department Selector 
             <div>
               <label htmlFor="regDept" className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
                 Assigned Department
@@ -185,7 +185,7 @@ export default function RegisterPage({ onRegister, onBackToLogin }) {
                 </select>
               </div>
             </div>
-
+              */}
             {/* Password */}
             <div>
               <label htmlFor="regPassword" className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
