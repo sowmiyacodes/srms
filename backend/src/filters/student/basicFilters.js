@@ -145,6 +145,20 @@ function applyBasicFilters(query, params) {
 
     }
 
+    
+    //-------------------------
+    // Faculty Advisor
+    //-------------------------
+
+    if (params.faId) {
+
+        query.whereIn(
+            "s.fa_id",
+            toArray(params.faId)
+        );
+
+    }
+
 }
 
 module.exports = {

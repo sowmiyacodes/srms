@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { 
+import React, { useState, useEffect } from 'react';
+import api from '../../api/axios';
+import {
   Filter, X, ChevronDown, ChevronUp, Search, Calendar, MapPin, Award
 } from 'lucide-react';
-import { 
-  BRANCHES, DEGREES, COMMUNITIES, RELIGIONS, ADMISSION_TYPES, 
-  ENTRY_TYPES, BLOOD_GROUPS, NATIONALITIES, GENDERS 
+import {
+  BRANCHES, DEGREES, COMMUNITIES, RELIGIONS, ADMISSION_TYPES,
+  ENTRY_TYPES, BLOOD_GROUPS, NATIONALITIES, GENDERS
 } from '../../constants/filterOptions';
 
-export default function StudentFilters({ 
-  filters, 
-  setFilters, 
-  clearFilters, 
-  isOpen, 
-  setIsOpen 
+export default function StudentFilters({
+  filters,
+  setFilters,
+  clearFilters,
+  isOpen,
+  setIsOpen
 }) {
   // Accordion open states
   const [openSections, setOpenSections] = useState({
@@ -25,6 +26,27 @@ export default function StudentFilters({
   const toggleSection = (section) => {
     setOpenSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const showFacultyFilter =
+    user?.role === "admin" ||
+    user?.role === "hod";
+
+  const [facultyList, setFacultyList] = useState([]);
+
+  useEffect(() => {
+
+    if (!showFacultyFilter) return;
+
+    api
+      .get("/staff/faculty")
+      .then((res) => {
+        setFacultyList(res);
+      })
+      .catch(console.error);
+
+  }, []);
 
   const handleCheckboxChange = (filterKey, value) => {
     const currentValues = filters[filterKey] ? filters[filterKey].split(',') : [];
@@ -45,14 +67,12 @@ export default function StudentFilters({
   });
 
   return (
-    <aside 
-      className={`bg-white border-r border-slate-200/50 flex flex-col justify-between transition-all duration-300 z-10 ${
-        isOpen ? 'w-80' : 'w-0 md:w-16'
-      }`}
+    <aside
+      className={`bg-white border-r border-slate-200/50 flex flex-col justify-between transition-all duration-300 z-10 ${isOpen ? 'w-80' : 'w-0 md:w-16'
+        }`}
     >
-      <div className={`flex-grow flex flex-col overflow-y-auto transition-opacity duration-200 ${
-        isOpen ? 'opacity-100 p-6' : 'opacity-0 md:opacity-100 md:p-3 pointer-events-none md:pointer-events-auto'
-      }`}>
+      <div className={`flex-grow flex flex-col overflow-y-auto transition-opacity duration-200 ${isOpen ? 'opacity-100 p-6' : 'opacity-0 md:opacity-100 md:p-3 pointer-events-none md:pointer-events-auto'
+        }`}>
         {isOpen ? (
           <div className="space-y-6">
             {/* Header */}
@@ -60,7 +80,7 @@ export default function StudentFilters({
               <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                 <Filter className="h-3.5 w-3.5" /> Filter Workspace
               </h2>
-              <button 
+              <button
                 onClick={clearFilters}
                 className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline transition-colors cursor-pointer"
               >
@@ -97,7 +117,7 @@ export default function StudentFilters({
                 <span>Academic Info</span>
                 {openSections.academic ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
               </button>
-              
+
               {openSections.academic && (
                 <div className="p-4 space-y-4 bg-white border-t border-slate-100">
                   {/* Degree Filter */}
@@ -135,6 +155,45 @@ export default function StudentFilters({
                       ))}
                     </div>
                   </div>
+
+                  {/*faculty*/}
+                  {showFacultyFilter && (
+
+                    <div className="space-y-1.5">
+
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                        Faculty Advisor
+                      </span>
+
+                      <select
+                        value={filters.faId || ""}
+                        onChange={(e) => {
+                          console.log("Selected FA:", e.target.value);
+                          setFilters("faId", e.target.value);
+                        }}
+                        className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      >
+
+                        <option value="">
+                          All Faculty Advisors
+                        </option>
+
+                        {facultyList.map((faculty) => (
+
+                          <option
+                            key={faculty.staffid}
+                            value={faculty.staffid}
+                          >
+                            {faculty.staffname}
+                          </option>
+
+                        ))}
+
+                      </select>
+
+                    </div>
+
+                  )}
 
                   {/* Admission Type */}
                   <div className="space-y-1.5">
@@ -184,7 +243,7 @@ export default function StudentFilters({
                 <span>Personal & Status</span>
                 {openSections.personal ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
               </button>
-              
+
               {openSections.personal && (
                 <div className="p-4 space-y-4 bg-white border-t border-slate-100">
                   {/* Status */}
@@ -210,11 +269,10 @@ export default function StudentFilters({
                           key={g}
                           type="button"
                           onClick={() => setFilters('gender', filters.gender === g ? '' : g)}
-                          className={`flex-grow py-1 px-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-                            filters.gender === g
-                              ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
-                              : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                          }`}
+                          className={`flex-grow py-1 px-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${filters.gender === g
+                            ? 'bg-blue-600 border-blue-600 text-white shadow-sm'
+                            : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                            }`}
                         >
                           {g}
                         </button>
@@ -262,7 +320,7 @@ export default function StudentFilters({
                 <span>Demographics</span>
                 {openSections.demographics ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
               </button>
-              
+
               {openSections.demographics && (
                 <div className="p-4 space-y-4 bg-white border-t border-slate-100">
                   {/* Community */}
@@ -349,7 +407,7 @@ export default function StudentFilters({
                 <span>Dates & Location</span>
                 {openSections.additional ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
               </button>
-              
+
               {openSections.additional && (
                 <div className="p-4 space-y-4 bg-white border-t border-slate-100">
                   {/* Date of Birth Range */}
@@ -423,10 +481,9 @@ export default function StudentFilters({
             <div className="p-2 bg-slate-100 rounded-lg text-slate-500" title="Expand filters">
               <Filter className="h-4 w-4" />
             </div>
-            <div 
-              className={`w-2.5 h-2.5 rounded-full ${
-                Object.values(filters).some(Boolean) ? 'bg-brand-accent' : 'bg-slate-300'
-              }`}
+            <div
+              className={`w-2.5 h-2.5 rounded-full ${Object.values(filters).some(Boolean) ? 'bg-brand-accent' : 'bg-slate-300'
+                }`}
               title="Filters active indicator"
             ></div>
           </div>
