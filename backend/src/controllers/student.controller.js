@@ -9,11 +9,19 @@ async function getStudents(req, res, next) {
 
     try {
 
-        const result = await studentService.getStudents(req.query);
+        const result = await studentService.getStudents(
+
+            req.query,
+
+            req.user
+
+        );
 
         return res.status(200).json(result);
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         next(error);
 

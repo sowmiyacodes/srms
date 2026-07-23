@@ -3,14 +3,19 @@ const { getStudentList } = require("../queries/student/studentListQuery");
 /**
  * Service: Get Student Listing
  *
- * Calls the query builder and returns the result.
- *
  * @param {Object} queryParams
+ * @param {Object} user
  * @returns {Object}
  */
-async function getStudents(queryParams) {
+async function getStudents(queryParams, user) {
 
-    const result = await getStudentList(queryParams);
+    const result = await getStudentList(
+
+        queryParams,
+
+        user
+
+    );
 
     return result;
 

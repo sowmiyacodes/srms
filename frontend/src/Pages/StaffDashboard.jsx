@@ -109,13 +109,13 @@ export default function StaffDashboard({ staffUser, onLogout }) {
 
       const studentList = data.data || [];
       setStudents(studentList);
-      setTotalRecords(data.pagination?.total || 0);
-      setTotalPages(data.pagination?.totalPages || 1);
+      setTotalRecords(data.meta?.totalRecords || 0);
+      setTotalPages(data.meta?.totalPages || 1);
 
       setStats({
-        total:      data.pagination?.total || 0,
-        active:     studentList.filter(s => s.status).length,
-        inactive:   studentList.filter(s => !s.status).length,
+        total: data.meta?.totalRecords || 0,
+        active: studentList.filter(s => s.status).length,
+        inactive: studentList.filter(s => !s.status).length,
         hostellers: studentList.filter(s => s.ishosteller).length,
       });
 

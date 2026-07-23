@@ -12,6 +12,7 @@ const knex = require("../../config/db");
  */
 
 function createBaseQuery() {
+
     return knex("student as s")
 
         // -----------------------------
@@ -46,6 +47,79 @@ function createBaseQuery() {
             "student_entry_type as et",
             "s.entrytypeid",
             "et.entrytypeid"
+        )
+
+        // -----------------------------
+        // Faculty Advisor
+        // -----------------------------
+
+        .leftJoin(
+            "staff as fa",
+            "s.fa_id",
+            "fa.staffid"
+        )
+
+        // -----------------------------
+        // Father
+        // -----------------------------
+
+        .leftJoin("student_parent as spf", function () {
+
+            this.on("s.studentid", "=", "spf.studentid")
+                .andOn(
+                    "spf.relationship",
+                    "=",
+                    knex.raw("?", ["Father"])
+                );
+
+        })
+
+        .leftJoin(
+            "parent_guardian as pf",
+            "spf.parentid",
+            "pf.parentid"
+        )
+
+        // -----------------------------
+        // Mother
+        // -----------------------------
+
+        .leftJoin("student_parent as spm", function () {
+
+            this.on("s.studentid", "=", "spm.studentid")
+                .andOn(
+                    "spm.relationship",
+                    "=",
+                    knex.raw("?", ["Mother"])
+                );
+
+        })
+
+        .leftJoin(
+            "parent_guardian as pm",
+            "spm.parentid",
+            "pm.parentid"
+        )
+
+        // -----------------------------
+        // Guardian
+        // -----------------------------
+
+        .leftJoin("student_parent as spg", function () {
+
+            this.on("s.studentid", "=", "spg.studentid")
+                .andOn(
+                    "spg.relationship",
+                    "=",
+                    knex.raw("?", ["Guardian"])
+                );
+
+        })
+
+        .leftJoin(
+            "parent_guardian as pg",
+            "spg.parentid",
+            "pg.parentid"
         )
 
         // -----------------------------
@@ -110,9 +184,60 @@ function createBaseQuery() {
 
             "et.entrytypeid",
 
-            "et.entrytypename"
+            "et.entrytypename",
+
+            // Faculty Advisor
+
+            "fa.staffid as facultyId",
+
+            "fa.staffcode as facultyCode",
+
+            "fa.staffname as facultyName",
+
+            "fa.emailid as facultyEmail",
+
+            "fa.mobileno as facultyMobile",
+
+            "fa.designation as facultyDesignation",
+
+            // Father
+
+            "pf.parentname as fatherName",
+
+            "pf.mobileno as fatherNo",
+
+            "pf.email as fatherEmail",
+
+            "pf.profession as fatherProfession",
+
+            "pf.annualincome as fatherIncome",
+
+            // Mother
+
+            "pm.parentname as motherName",
+
+            "pm.mobileno as motherNo",
+
+            "pm.email as motherEmail",
+
+            "pm.profession as motherProfession",
+
+            "pm.annualincome as motherIncome",
+
+            // Guardian
+
+            "pg.parentname as guardianName",
+
+            "pg.mobileno as guardianNo",
+
+            "pg.email as guardianEmail",
+
+            "pg.profession as guardianProfession",
+
+            "pg.annualincome as guardianIncome"
 
         );
+
 }
 
 module.exports = {

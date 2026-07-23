@@ -12,13 +12,13 @@ export default function StudentTable({
   onSort 
 }) {
   const headers = [
-    { label: 'Student Details', key: 'name', sortable: true },
-    { label: 'Register Number', key: 'regNo', sortable: true },
-    { label: 'Degree / Branch', key: 'branch', sortable: true },
-    { label: 'Gender', key: 'gender', sortable: true },
-    { label: 'Joining Date', key: 'joiningDate', sortable: true },
-    { label: 'Status', key: 'status', sortable: true },
-  ];
+  { label: 'Student Details', key: 'name', sortable: true },
+  { label: 'Register Number', key: 'regNo', sortable: true },
+  { label: 'Degree / Branch', key: 'branch', sortable: true },
+  { label: 'Faculty Advisor', key: 'facultyName', sortable: true },
+  { label: 'Faculty Mobile', key: 'facultyMobile', sortable: false },
+  { label: 'Parent Mobile', key: 'parentMobile', sortable: false },
+];
 
   const handleHeaderClick = (key, sortable) => {
     if (!sortable) return;
@@ -89,25 +89,40 @@ export default function StudentTable({
                 </div>
               </td>
 
-              {/* Gender */}
-              <td className="px-6 py-4 text-slate-600 text-xs">
-                {student.gender}
-              </td>
-
-              {/* Joining Date */}
-              <td className="px-6 py-4 text-slate-600 text-xs">
-                {student.dateofjoining ? new Date(student.dateofjoining).toLocaleDateString('en-US', {
-                  year: 'numeric', month: 'short', day: 'numeric'
-                }) : 'N/A'}
-              </td>
-
-              {/* Status */}
+              {/* Faculty Advisor */}
               <td className="px-6 py-4">
-                {student.status ? (
-                  <Badge text="Active" variant="success" />
-                ) : (
-                  <Badge text="Inactive" variant="danger" />
-                )}
+                <div className="text-slate-900 font-semibold text-xs">
+                  {student.facultyName || student.staffname || "-"}
+                </div>
+              </td>
+
+              {/* Faculty Mobile */}
+              <td className="px-6 py-4 text-slate-600 text-xs">
+                {student.facultyMobile || student.facultymobile || "-"}
+              </td>
+
+              {/* Parent Mobile */}
+              <td className="px-6 py-4">
+                <div className="text-slate-600 text-xs">
+                  {student.fatherNo ? (
+                    <>
+                      <span className="font-semibold text-slate-800">Father:</span>{" "}
+                      {student.fatherNo}
+                    </>
+                  ) : student.motherNo ? (
+                    <>
+                      <span className="font-semibold text-slate-800">Mother:</span>{" "}
+                      {student.motherNo}
+                    </>
+                  ) : student.guardianNo ? (
+                    <>
+                      <span className="font-semibold text-slate-800">Guardian:</span>{" "}
+                      {student.guardianNo}
+                    </>
+                  ) : (
+                    "-"
+                  )}
+                </div>
               </td>
 
               {/* Actions */}

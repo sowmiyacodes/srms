@@ -39,8 +39,13 @@ export default function LoginPage({ role, onLogin, onBack, onGoToRegister }) {
         throw new Error(data.message || "Login failed");
       }
 
-      // Store logged-in user and status
+      // Store JWT
+      localStorage.setItem("token", data.token);
+
+      // Store logged-in user
       localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Login status
       localStorage.setItem("isLoggedIn", "true");
 
       // Call parent component
@@ -65,14 +70,14 @@ export default function LoginPage({ role, onLogin, onBack, onGoToRegister }) {
       <div className="relative z-10 w-full max-w-md bg-white rounded-2xl border border-slate-200/50 shadow-2xl overflow-hidden animate-slide-up">
         {/* Card Header */}
         <div className="bg-slate-900 px-6 py-8 text-white relative">
-          <button 
+          <button
             onClick={onBack}
             className="absolute top-6 left-6 text-slate-400 hover:text-white flex items-center gap-1.5 text-xs font-semibold transition-all group"
           >
             <ArrowLeft className="h-3.5 w-3.5 transform group-hover:-translate-x-0.5 transition-transform" />
             Back
           </button>
-          
+
           <div className="flex flex-col items-center mt-4">
             <div className={`p-3 rounded-xl mb-4 ${role === 'admin' ? 'bg-brand-accent/20 text-brand-accent-hover border border-brand-accent/40' : 'bg-blue-500/20 text-blue-400 border border-blue-500/40'}`}>
               {role === 'admin' ? <ShieldCheck className="h-7 w-7" /> : <UserCheck className="h-7 w-7" />}
@@ -89,21 +94,7 @@ export default function LoginPage({ role, onLogin, onBack, onGoToRegister }) {
         {/* Card Body */}
         <div className="p-8 bg-slate-50">
           {/* Quick Demo Pre-fill */}
-          <div className="mb-6 p-3 bg-blue-50 border border-blue-150 rounded-xl flex items-center justify-between text-xs">
-            <div>
-              <span className="font-semibold text-blue-900">Testing Credentials:</span>
-              <p className="text-blue-700 font-mono mt-0.5">
-                {role === 'admin' ? 'admin@srms.edu / admin123' : 'advisor@srms.edu / advisor123'}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handlePreFill}
-              className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium shadow-sm transition-all"
-            >
-              Auto-Fill
-            </button>
-          </div>
+          
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm font-medium animate-fade-in animate-shake">
@@ -172,11 +163,10 @@ export default function LoginPage({ role, onLogin, onBack, onGoToRegister }) {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 text-white rounded-lg font-bold text-sm shadow-md transition-all duration-300 btn-ripple ${
-                role === "admin"
+              className={`w-full py-3 text-white rounded-lg font-bold text-sm shadow-md transition-all duration-300 btn-ripple ${role === "admin"
                   ? "bg-brand-accent hover:bg-brand-accent-hover"
                   : "bg-blue-600 hover:bg-blue-700"
-              } ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
+                } ${loading ? "opacity-70 cursor-not-allowed" : ""}`}
             >
               {loading ? "Signing In..." : "Sign In to Dashboard"}
             </button>

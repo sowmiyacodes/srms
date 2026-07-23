@@ -13,7 +13,7 @@ const { applySorting } = require("../../filters/student/sorting");
 const { applyPagination } = require("../../filters/student/pagination");
 
 const { buildCountQuery } = require("../../filters/student/countQuery");
-
+const { applyRoleFilter } = require("../../filters/student/roleFilter");
 /**
  * Builds and executes the Student Listing query.
  *
@@ -25,7 +25,7 @@ const { buildCountQuery } = require("../../filters/student/countQuery");
  * }
  */
 
-async function getStudentList(params) {
+async function getStudentList(params,user) {
 
     //------------------------------------------------
     // Create Base Query
@@ -44,6 +44,7 @@ async function getStudentList(params) {
     applyRangeFilters(query, params);
 
     applyExistsFilters(query, params);
+    applyRoleFilter(query, user);
 
     //------------------------------------------------
     // Count Query

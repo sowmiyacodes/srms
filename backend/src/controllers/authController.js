@@ -1,5 +1,6 @@
 const supabase = require("../config/supabase");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 // ================= Register =================
 
@@ -10,11 +11,9 @@ exports.register = async (req, res) => {
         const {
             full_name,
             email,
-            department,
             password
         } = req.body;
 
-        // Check existing email
         const { data: existingUser } = await supabase
             .from("users")
             .select("*")
@@ -30,7 +29,6 @@ exports.register = async (req, res) => {
 
         }
 
-        // Hash Password
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const { data, error } = await supabase
@@ -39,7 +37,6 @@ exports.register = async (req, res) => {
                 {
                     full_name,
                     email,
-                    
                     password: hashedPassword,
                     role: "faculty"
                 }
@@ -56,9 +53,13 @@ exports.register = async (req, res) => {
         }
 
         res.status(201).json({
+
             success: true,
+
             message: "Faculty Registered Successfully",
+
             user: data
+
         });
 
     }
@@ -66,8 +67,11 @@ exports.register = async (req, res) => {
     catch (err) {
 
         res.status(500).json({
+
             success: false,
+
             message: err.message
+
         });
 
     }
@@ -88,11 +92,26 @@ exports.login = async (req, res) => {
             .eq("email", email)
             .maybeSingle();
 
+        if (error) {
+
+            return res.status(500).json({
+
+                success: false,
+
+                message: error.message
+
+            });
+
+        }
+
         if (!data) {
 
             return res.status(404).json({
+
                 success: false,
+
                 message: "User not found"
+
             });
 
         }
@@ -105,11 +124,30 @@ exports.login = async (req, res) => {
         if (!isMatch) {
 
             return res.status(401).json({
+
                 success: false,
+
                 message: "Invalid Password"
+
             });
 
         }
+
+        const token = jwt.sign(
+
+            {
+                userId: data.id,
+                staffId: data.staff_id,
+                role: data.role
+            },
+
+            process.env.JWT_SECRET,
+
+            {
+                expiresIn: process.env.JWT_EXPIRES_IN
+            }
+
+        );
 
         res.status(200).json({
 
@@ -117,15 +155,17 @@ exports.login = async (req, res) => {
 
             message: "Login Successful",
 
+            token,
+
             user: {
 
                 id: data.id,
 
+                staffId: data.staff_id,
+
                 full_name: data.full_name,
 
                 email: data.email,
-
-                
 
                 role: data.role
 
