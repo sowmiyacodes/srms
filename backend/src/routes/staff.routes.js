@@ -9,4 +9,14 @@ router.get(
     staffController.getFacultyList
 );
 
+router.get(
+    "/",
+    staffController.getStaffList
+);
+
+router.get(
+    "/:id",
+    staffController.getStaffDetails
+);
+
 module.exports = router;

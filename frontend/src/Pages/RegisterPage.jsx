@@ -37,7 +37,6 @@ export default function RegisterPage({ onRegister, onBackToLogin }) {
       const data = await authApi.register({
         full_name: name,
         email: email,
-        department: department,
         password: password,
       });
 

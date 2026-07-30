@@ -40,8 +40,7 @@ const DEFAULT_FILTERS = {
   state: '',
 };
 
-export default function StaffDashboard({ staffUser, onLogout }) {
-  // ─── State ──────────────────────────────────────────────────────
+export default function StaffDashboard({ staffUser, currentUser, onLogout }) {  // ─── State ──────────────────────────────────────────────────────
   const [students, setStudents]         = useState([]);
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState(null);

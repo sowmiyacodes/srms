@@ -11,9 +11,12 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
+import HODHomePage from "./pages/HODHomePage";
+import StaffManagement from "./pages/StaffManagement";
 
 export default function App() {
   const navigate = useNavigate();
+
   const [loginRole, setLoginRole] = useState("staff");
   const [currentUser, setCurrentUser] = useState(null);
 
@@ -21,6 +24,7 @@ export default function App() {
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     const userStr = localStorage.getItem("user");
+
     if (isLoggedIn && userStr) {
       try {
         const user = JSON.parse(userStr);
@@ -34,6 +38,7 @@ export default function App() {
   // Navigation handlers
   const handleSelectPortal = (role) => {
     setLoginRole(role);
+
     if (role === "staff") {
       navigate("/stafflogin");
     } else {
@@ -60,8 +65,10 @@ export default function App() {
   // Login handler
   const handleLogin = (user) => {
     setCurrentUser(user);
-    if (user.role === "admin") {
-      navigate("/admindashboard");
+
+    // Both HOD and Admin enter the same HOD Home Page
+    if (user.role === "hod" || user.role === "admin") {
+      navigate("/hod");
     } else {
       navigate("/staffdashboard");
     }
@@ -70,10 +77,18 @@ export default function App() {
   // Logout handler
   const handleLogout = () => {
     setCurrentUser(null);
+
     localStorage.removeItem("user");
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("token");
+
     navigate("/");
   };
+
+  // Check whether current user is HOD or Admin
+  const isManagementUser =
+    currentUser?.role === "hod" ||
+    currentUser?.role === "admin";
 
   return (
     <Routes>
@@ -100,7 +115,7 @@ export default function App() {
         }
       />
 
-      {/* Admin Login */}
+      {/* HOD / Admin Login */}
       <Route
         path="/adminlogin"
         element={
@@ -112,7 +127,7 @@ export default function App() {
         }
       />
 
-      {/* Register */}
+      {/* Staff Register */}
       <Route
         path="/staffregister"
         element={
@@ -123,7 +138,48 @@ export default function App() {
         }
       />
 
-      {/* Admin Dashboard */}
+      {/* HOD Home Page */}
+      <Route
+        path="/hod"
+        element={
+          isManagementUser ? (
+            <HODHomePage currentUser={currentUser} />
+          ) : (
+            <Navigate to="/adminlogin" replace />
+          )
+        }
+      />
+
+      {/* Staff Management */}
+      <Route
+        path="/hod/staff"
+        element={
+          isManagementUser ? (
+            <StaffManagement
+              currentUser={currentUser}
+            />
+          ) : (
+            <Navigate to="/adminlogin" replace />
+          )
+        }
+      />
+
+      {/* Student Management */}
+      <Route
+        path="/hod/students"
+        element={
+          isManagementUser ? (
+            <AdminDashboard
+              adminUser={currentUser}
+              onLogout={handleLogout}
+            />
+          ) : (
+            <Navigate to="/adminlogin" replace />
+          )
+        }
+      />
+
+      {/* Existing Admin Dashboard */}
       <Route
         path="/admindashboard"
         element={
@@ -142,7 +198,9 @@ export default function App() {
       <Route
         path="/staffdashboard"
         element={
-          currentUser && currentUser.role !== "admin" ? (
+          currentUser &&
+          currentUser.role !== "admin" &&
+          currentUser.role !== "hod" ? (
             <StaffDashboard
               staffUser={currentUser}
               onLogout={handleLogout}
