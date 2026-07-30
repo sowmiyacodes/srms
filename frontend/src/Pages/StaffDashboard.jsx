@@ -59,6 +59,9 @@ export default function StaffDashboard({ staffUser, currentUser, onLogout }) {  
     total: 0, active: 0, inactive: 0, hostellers: 0
   });
 
+  const isAdmin = currentUser?.role === "admin";
+
+
   const debouncedSearch = useDebounce(filters.search, 400);
 
   // ─── Filter Helpers ──────────────────────────────────────────────

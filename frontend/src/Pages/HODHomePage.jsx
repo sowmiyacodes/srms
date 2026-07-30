@@ -39,7 +39,7 @@ const HODHomePage = () => {
       <div className="mx-auto max-w-7xl">
         <div className="mb-12">
           <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-blue-600">
-            HOD Portal
+           
           </p>
 
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
