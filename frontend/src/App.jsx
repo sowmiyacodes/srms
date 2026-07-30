@@ -36,15 +36,17 @@ export default function App() {
   }, []);
 
   // Navigation handlers
-  const handleSelectPortal = (role) => {
-    setLoginRole(role);
+const handleSelectPortal = (role) => {
+  setLoginRole(role);
 
-    if (role === "staff") {
-      navigate("/stafflogin");
-    } else {
-      navigate("/adminlogin");
-    }
-  };
+  if (role === "staff") {
+    navigate("/stafflogin");
+  } else if (role === "hod") {
+    navigate("/hodlogin");
+  } else {
+    navigate("/adminlogin");
+  }
+};
 
   const handleGoToRegister = () => {
     navigate("/staffregister");
@@ -54,13 +56,15 @@ export default function App() {
     navigate("/");
   };
 
-  const handleBackToLogin = () => {
-    if (loginRole === "staff") {
-      navigate("/stafflogin");
-    } else {
-      navigate("/adminlogin");
-    }
-  };
+const handleBackToLogin = () => {
+  if (loginRole === "staff") {
+    navigate("/stafflogin");
+  } else if (loginRole === "hod") {
+    navigate("/hodlogin");
+  } else {
+    navigate("/adminlogin");
+  }
+};
 
   // Login handler
   const handleLogin = (user) => {
@@ -127,6 +131,17 @@ export default function App() {
         }
       />
 
+      <Route
+        path="/hodlogin"
+        element={
+          <LoginPage
+            role="hod"
+            onLogin={handleLogin}
+            onBack={handleBackToLanding}
+          />
+        }
+/>
+
       {/* Staff Register */}
       <Route
         path="/staffregister"
@@ -139,45 +154,45 @@ export default function App() {
       />
 
       {/* HOD Home Page */}
-      <Route
-        path="/hod"
-        element={
-          isManagementUser ? (
-            <HODHomePage currentUser={currentUser} />
-          ) : (
-            <Navigate to="/adminlogin" replace />
-          )
-        }
-      />
+<Route
+  path="/hod"
+  element={
+    isManagementUser ? (
+      <HODHomePage currentUser={currentUser} />
+    ) : (
+      <Navigate to="/hodlogin" replace />
+    )
+  }
+/>
 
-      {/* Staff Management */}
-      <Route
-        path="/hod/staff"
-        element={
-          isManagementUser ? (
-            <StaffManagement
-              currentUser={currentUser}
-            />
-          ) : (
-            <Navigate to="/adminlogin" replace />
-          )
-        }
+{/* Staff Management */}
+<Route
+  path="/hod/staff"
+  element={
+    isManagementUser ? (
+      <StaffManagement
+        currentUser={currentUser}
       />
+    ) : (
+      <Navigate to="/hodlogin" replace />
+    )
+  }
+/>
 
-      {/* Student Management */}
-      <Route
-        path="/hod/students"
-        element={
-          isManagementUser ? (
-            <AdminDashboard
-              adminUser={currentUser}
-              onLogout={handleLogout}
-            />
-          ) : (
-            <Navigate to="/adminlogin" replace />
-          )
-        }
+{/* Student Management */}
+<Route
+  path="/hod/students"
+  element={
+    isManagementUser ? (
+      <AdminDashboard
+        adminUser={currentUser}
+        onLogout={handleLogout}
       />
+    ) : (
+      <Navigate to="/hodlogin" replace />
+    )
+  }
+/>
 
       {/* Existing Admin Dashboard */}
       <Route
