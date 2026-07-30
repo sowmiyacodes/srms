@@ -19,12 +19,12 @@ export default function StudentProfileModal({ student, onClose }) {
             <Calendar className="w-3.5 h-3.5" /> Approved Term Leave
           </span>
         );
-      case 'Suspended':
+      case 'Suspended': 
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-200">
             <AlertTriangle className="w-3.5 h-3.5" /> Academic Suspension
           </span>
-        );
+        ); 
       default:
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-50 text-slate-700 border border-slate-200">

@@ -144,7 +144,7 @@ export default function LandingPage({ onSelectPortal }) {
 
         </div>
       </main>
-
+ 
       {/* Institutional Footer */}
       <footer className="relative z-10 w-full py-4 text-center border-t border-slate-900/60 bg-slate-950/80 backdrop-blur-md">
         <p className="text-xs text-slate-500">

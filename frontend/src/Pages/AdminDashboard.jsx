@@ -16,7 +16,7 @@ import Pagination from '../components/students/Pagination';
 import Spinner from '../components/common/Spinner';
 import EmptyState from '../components/common/EmptyState';
 import Toast from '../components/common/Toast';
-
+ 
 const DEFAULT_FILTERS = {
   search: '',
   status: '',

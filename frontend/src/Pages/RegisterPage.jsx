@@ -14,7 +14,7 @@ export default function RegisterPage({ onRegister, onBackToLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+   
     if (!name || !email || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       return;
@@ -38,7 +38,7 @@ export default function RegisterPage({ onRegister, onBackToLogin }) {
         full_name: name,
         email: email,
         password: password,
-      });
+      }); 
 
       if (!data.success) {
         throw new Error(data.message || "Registration failed");

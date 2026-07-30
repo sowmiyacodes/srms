@@ -75,7 +75,7 @@ export default function StaffManagement({ currentUser }) {
 
   useEffect(() => {
     fetchStaff();
-  }, [page, search]);
+  }, [page, search]); 
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
@@ -315,5 +315,6 @@ export default function StaffManagement({ currentUser }) {
         />
       )}
     </div>
-  );
-}
+  ); 
+
+} 

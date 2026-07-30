@@ -234,7 +234,7 @@ try {
               {loading ? "Signing In..." : "Sign In to Dashboard"}
             </button>
           </form>
-
+   
           {/* Faculty Register */}
           {role === "staff" && (
             <div className="mt-6 border-t border-slate-200 pt-6 text-center">

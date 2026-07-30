@@ -180,7 +180,7 @@ export default function StaffDashboard({ staffUser, currentUser, onLogout }) {  
         />
       )}
 
-      {/* Dashboard Header */}
+      {/* Dashboard Header */} 
       <DashboardHeader user={staffUser} onLogout={onLogout} />
 
       {/* Advisory Notice Banner */}
