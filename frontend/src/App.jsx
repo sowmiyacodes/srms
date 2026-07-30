@@ -111,7 +111,7 @@ const handleBackToLogin = () => {
         path="/stafflogin"
         element={
           <LoginPage
-            role="staff"
+            role="faculty"
             onLogin={handleLogin}
             onBack={handleBackToLanding}
             onGoToRegister={handleGoToRegister}
