@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users, PanelLeftClose, PanelLeftOpen, RefreshCw,
-  Download, AlertCircle, GraduationCap
+  Download, AlertCircle, GraduationCap, Building2,
+  Bus
 } from 'lucide-react';
 
 import { studentApi } from '../api/student.api';
@@ -58,7 +59,10 @@ export default function AdminDashboard({ adminUser, onLogout }) {
 
   // Stats derived from API response
   const [stats, setStats] = useState({
-    total: 0, active: 0, inactive: 0, hostellers: 0
+    itStudents: 0,
+    aidsStudents: 0,
+    hostellers: 0,
+    dayScholars: 0,
   });
 
   const debouncedSearch = useDebounce(filters.search, 400);
@@ -116,13 +120,23 @@ export default function AdminDashboard({ adminUser, onLogout }) {
       setTotalRecords(data.meta?.totalRecords || 0);
       setTotalPages(data.meta?.totalPages || 1);
 
+      const isItStudent = (student) => {
+        const branch = String(student.branchname || student.department || '').toLowerCase();
+        return branch.includes('information technology') || branch === 'it';
+      };
+
+      const isAidsStudent = (student) => {
+        const branch = String(student.branchname || student.department || '').toLowerCase();
+        return branch.includes('artificial intelligence and data science') || branch === 'aids';
+      };
+
       // Compute simple stats from the page data (full stats come from pagination.total)
       setStats({
-              total: data.meta?.totalRecords || 0,
-              active: studentList.filter(s => s.status).length,
-              inactive: studentList.filter(s => !s.status).length,
-              hostellers: studentList.filter(s => s.ishosteller).length,
-            });
+        itStudents: studentList.filter(isItStudent).length,
+        aidsStudents: studentList.filter(isAidsStudent).length,
+        hostellers: studentList.filter(s => s.ishosteller).length,
+        dayScholars: studentList.filter(s => !s.ishosteller).length,
+      });
 
     } catch (err) {
       console.error('Failed to fetch students:', err);
@@ -190,33 +204,33 @@ export default function AdminDashboard({ adminUser, onLogout }) {
       {/* Stats Row */}
       <div className="px-6 pt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
-          title="Total Students"
-          value={totalRecords}
+          title="IT Students"
+          value={stats.itStudents}
           icon={Users}
           color="blue"
         />
         <StatCard
-          title="Active (This Page)"
-          value={stats.active}
-          icon={GraduationCap}
+          title="AIDS Students"
+          value={stats.aidsStudents}
+          icon={Users}
           color="emerald"
         />
         <StatCard
-          title="Inactive (This Page)"
-          value={stats.inactive}
-          icon={AlertCircle}
+          title="Hostellers"
+          value={stats.hostellers}
+          icon={Building2}
           color="brand"
         />
         <StatCard
-          title="Hostellers (This Page)"
-          value={stats.hostellers}
-          icon={Users}
+          title="Day Scholars"
+          value={stats.dayScholars}
+          icon={Bus}
           color="violet"
         />
       </div>
 
       {/* Main Panel: Sidebar + Table */}
-      <div className="flex flex-grow overflow-hidden mt-6 mx-6 mb-6 bg-white rounded-xl border border-slate-200 shadow-sm">
+      <div className="flex grow overflow-hidden mt-6 mx-6 mb-6 bg-white rounded-xl border border-slate-200 shadow-sm">
         {/* Sidebar Filters */}
         <StudentFilters
           filters={filters}
@@ -227,7 +241,7 @@ export default function AdminDashboard({ adminUser, onLogout }) {
         />
 
         {/* Table Section */}
-        <div className="flex-grow flex flex-col overflow-hidden">
+        <div className="grow flex flex-col overflow-hidden">
           {/* Toolbar */}
           <div className="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
@@ -275,7 +289,7 @@ export default function AdminDashboard({ adminUser, onLogout }) {
           </div>
 
           {/* Table Body */}
-          <div className="flex-grow overflow-y-auto">
+          <div className="grow overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center h-48">
                 <Spinner />

@@ -140,7 +140,7 @@ const handleBackToLogin = () => {
             onBack={handleBackToLanding}
           />
         }
-/>
+      />
 
       {/* Staff Register */}
       <Route

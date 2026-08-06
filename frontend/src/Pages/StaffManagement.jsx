@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { getStaffList } from "../api/staff.api";
 import StaffDetailsModal from "../components/staff/StaffDetailsModal";
-
+import FAManagement from "../components/staff/FAManagement";
 export default function StaffManagement({ currentUser }) {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,6 +20,8 @@ export default function StaffManagement({ currentUser }) {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
+  const [designation, setDesignation] = useState("");
+
   const [selectedStaffId, setSelectedStaffId] = useState(null);
 
   const [pagination, setPagination] = useState({
@@ -27,7 +29,7 @@ export default function StaffManagement({ currentUser }) {
     pageSize: 10,
     count: 0,
   });
-
+  const [activeTab, setActiveTab] = useState("staff");
   const isAdmin = currentUser?.role === "admin";
 
   const fetchStaff = async () => {
@@ -82,6 +84,8 @@ export default function StaffManagement({ currentUser }) {
     setPage(1);
   };
 
+  
+
   const canGoPrevious = page > 1;
   const canGoNext = staff.length === pageSize;
 
@@ -94,6 +98,21 @@ export default function StaffManagement({ currentUser }) {
     console.log("Delete staff:", staffId);
     // Delete functionality will be added next
   };
+
+  const designationOptions = [
+  ...new Set(
+    staff
+      .map((member) => member.designation)
+      .filter(Boolean)
+  ),
+].sort();
+
+const filteredStaff = staff.filter((member) => {
+  const matchesDesignation =
+    designation === "" || member.designation === designation;
+
+  return matchesDesignation;
+});
 
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-8 md:px-10">
@@ -116,24 +135,69 @@ export default function StaffManagement({ currentUser }) {
             </div>
           </div>
         </div>
+                {/* Tabs */}
+        <div className="mb-6 flex gap-3">
+          <button
+            onClick={() => setActiveTab("staff")}
+            className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition
+              ${
+                activeTab === "staff"
+                  ? "bg-blue-600 text-white shadow"
+                  : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
+              }`}
+          >
+            Staff
+          </button>
 
+          <button
+            onClick={() => setActiveTab("fa")}
+            className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition
+              ${
+                activeTab === "fa"
+                  ? "bg-blue-600 text-white shadow"
+                  : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
+              }`}
+          >
+            FA
+          </button>
+        </div>
+        {activeTab === "staff" ? (
+  <>
         {/* Search */}
         <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="relative max-w-md">
-            <Search
-              size={19}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-            />
+  <div className="flex items-center justify-between gap-4">
+    {/* Search Box */}
+    <div className="relative flex-1 max-w-md">
+      <Search
+        size={19}
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+      />
 
-            <input
-              type="text"
-              value={search}
-              onChange={handleSearchChange}
-              placeholder="Search by name, code or email..."
-              className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            />
-          </div>
-        </div>
+      <input
+        type="text"
+        value={search}
+        onChange={handleSearchChange}
+        placeholder="Search by name, code or email..."
+        className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+      />
+    </div>
+
+    {/* Designation Filter */}
+    <select
+      value={designation}
+      onChange={(e) => setDesignation(e.target.value)}
+      className="w-56 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+    >
+      <option value="">All Designations</option>
+
+      {designationOptions.map((item) => (
+        <option key={item} value={item}>
+          {item}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
 
         {/* Error */}
         {error && (
@@ -198,7 +262,7 @@ export default function StaffManagement({ currentUser }) {
                     </td>
                   </tr>
                 ) : (
-                  staff.map((member) => (
+                  filteredStaff.map((member) => (
                     <tr
                       key={member.staffid}
                       className="transition hover:bg-slate-50"
@@ -305,16 +369,20 @@ export default function StaffManagement({ currentUser }) {
             </div>
           </div>
         </div>
-      </div>
+      
 
-      {/* Staff Details Modal */}
+            {/* Staff Details Modal */}
       {selectedStaffId && (
         <StaffDetailsModal
           staffId={selectedStaffId}
           onClose={() => setSelectedStaffId(null)}
         />
       )}
+      </>
+    ) : (
+      <FAManagement />
+    )}
     </div>
-  ); 
-
-} 
+    </div>
+  );
+}
