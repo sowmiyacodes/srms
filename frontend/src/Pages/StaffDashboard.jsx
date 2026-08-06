@@ -122,23 +122,18 @@ export default function StaffDashboard({ staffUser, currentUser, onLogout }) {  
       setTotalRecords(data.meta?.totalRecords || 0);
       setTotalPages(data.meta?.totalPages || 1);
 
-      const isItStudent = (student) => {
-        const branch = String(student.branchname || student.department || '').toLowerCase();
-        return branch.includes('information technology') || branch === 'it';
-      };
+      // const isItStudent = (student) => {
+      //   const branch = String(student.branchname || student.department || '').toLowerCase();
+      //   return branch.includes('information technology') || branch === 'it';
+      // };
 
-      const isAidsStudent = (student) => {
-        const branch = String(student.branchname || student.department || '').toLowerCase();
-        return branch.includes('artificial intelligence and data science') || branch === 'aids';
-      };
+      // const isAidsStudent = (student) => {
+      //   const branch = String(student.branchname || student.department || '').toLowerCase();
+      //   return branch.includes('artificial intelligence and data science') || branch === 'aids';
+      // };
 
 
-      setStats({
-        itstudents: studentList.filter(isItStudent).length,
-        aidsstudents: studentList.filter(isAidsStudent).length,
-        hostellers: studentList.filter(s => s.ishosteller).length,
-        dayscholars: studentList.filter(s=> !s.ishosteller).length,
-      });
+      setStats(data.stats);
 
     } catch (err) {
       console.error('Failed to fetch students:', err);
@@ -213,25 +208,25 @@ export default function StaffDashboard({ staffUser, currentUser, onLogout }) {  
       <div className="px-6 pt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
         <StatCard
           title="IT STUDENTS"
-          value={stats.itstudents}
+          value={stats.itStudents}
           icon={Users}
           color="blue"
         />
         <StatCard
           title="AIDS STUDENTS"
-          value={stats.aidsstudents}
+          value={stats.aidsStudents}
           icon={Users}
           color="emerald"
         />
         <StatCard
           title="DAY SCHOLARS"
-          value={stats.hostellers}
+          value={stats.dayScholars}
           icon={Building2}
           color="brand"
         />
         <StatCard
           title="Hostellers "
-          value={stats.dayscholars}
+          value={stats.hostellers}
           icon={Bus}
           color="violet"
         />

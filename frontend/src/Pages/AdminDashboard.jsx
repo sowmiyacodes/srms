@@ -120,23 +120,18 @@ export default function AdminDashboard({ adminUser, onLogout }) {
       setTotalRecords(data.meta?.totalRecords || 0);
       setTotalPages(data.meta?.totalPages || 1);
 
-      const isItStudent = (student) => {
-        const branch = String(student.branchname || student.department || '').toLowerCase();
-        return branch.includes('information technology') || branch === 'it';
-      };
+      // const isItStudent = (student) => {
+      //   const branch = String(student.branchname || student.department || '').toLowerCase();
+      //   return branch.includes('information technology') || branch === 'it';
+      // };
 
-      const isAidsStudent = (student) => {
-        const branch = String(student.branchname || student.department || '').toLowerCase();
-        return branch.includes('artificial intelligence and data science') || branch === 'aids';
-      };
+      // const isAidsStudent = (student) => {
+      //   const branch = String(student.branchname || student.department || '').toLowerCase();
+      //   return branch.includes('artificial intelligence and data science') || branch === 'aids';
+      // };
 
       // Compute simple stats from the page data (full stats come from pagination.total)
-      setStats({
-        itStudents: studentList.filter(isItStudent).length,
-        aidsStudents: studentList.filter(isAidsStudent).length,
-        hostellers: studentList.filter(s => s.ishosteller).length,
-        dayScholars: studentList.filter(s => !s.ishosteller).length,
-      });
+      setStats(data.stats);
 
     } catch (err) {
       console.error('Failed to fetch students:', err);

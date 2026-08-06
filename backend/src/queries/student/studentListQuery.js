@@ -14,6 +14,8 @@ const { applyPagination } = require("../../filters/student/pagination");
 
 const { buildCountQuery } = require("../../filters/student/countQuery");
 const { applyRoleFilter } = require("../../filters/student/roleFilter");
+
+const { buildDashboardStatsQuery } = require("../../filters/student/dashboardStatsQuery");
 /**
  * Builds and executes the Student Listing query.
  *
@@ -53,6 +55,12 @@ async function getStudentList(params,user) {
     const countQuery = buildCountQuery(query);
 
     //------------------------------------------------
+    // Dashboard Stats
+    //------------------------------------------------
+
+    const statsQuery = buildDashboardStatsQuery(query);
+
+    //------------------------------------------------
     // Sorting
     //------------------------------------------------
 
@@ -68,11 +76,13 @@ async function getStudentList(params,user) {
     // Execute Queries
     //------------------------------------------------
 
-    const [students, totalResult] = await Promise.all([
+    const [students, totalResult, stats] = await Promise.all([
 
         query,
 
-        countQuery
+        countQuery,
+
+        statsQuery
 
     ]);
 
@@ -110,7 +120,9 @@ async function getStudentList(params,user) {
 
             totalPages
 
-        }
+        },
+
+        stats
 
     };
 
