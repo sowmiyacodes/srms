@@ -11,7 +11,16 @@ const buildFAListQuery = async () => {
       "s.staffname",
       "s.emailid",
       "s.mobileno"
-    );
+    )
+    .count("st.studentid as studentCount")
+    .groupBy(
+      "st.regno",
+      "s.staffid",
+      "s.staffname",
+      "s.emailid",
+      "s.mobileno"
+    )
+    .orderBy("st.regno", "asc");
 
   console.log(rows);
 
