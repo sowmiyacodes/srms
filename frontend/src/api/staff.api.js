@@ -1,21 +1,19 @@
 import axios from "./axios";
 
 export const getStaffList = async (params = {}) => {
-  const response = await axios.get("/staff", {
+  return await axios.get("/staff", {
     params,
   });
-
-  return response.data;
 };
 
 export const getFacultyList = async () => {
-  const response = await axios.get("/staff/faculty");
-
-  return response.data;
+  return await axios.get("/staff/faculty");
 };
 
 export const getStaffDetails = async (staffId) => {
-  const response = await axios.get(`/staff/${staffId}`);
+  return await axios.get(`/staff/${staffId}`);
+};
 
-  return response.data;
+export const getFAList = async () => {
+  return await axios.get("/staff/fa");
 };

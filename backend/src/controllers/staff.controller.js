@@ -41,8 +41,26 @@ async function getStaffDetails(req, res, next) {
     }
 }
 
+/* ===========================
+   FA LIST
+=========================== */
+
+async function getFAList(req, res, next) {
+    try {
+        const data = await staffService.getFAList();
+
+        res.json({
+            success: true,
+            data,
+        });
+    } catch (err) {
+        next(err);
+    }
+}
+
 module.exports = {
     getFacultyList,
     getStaffList,
     getStaffDetails,
+    getFAList,
 };

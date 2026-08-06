@@ -6,6 +6,10 @@ const {
   buildStaffDetailQuery,
 } = require("../queries/staff/staffDetailQuery");
 
+const {
+  buildFAListQuery,
+} = require("../queries/staff/faListQuery");
+
 const getStaffList = async (filters = {}) => {
   const page = Math.max(parseInt(filters.page, 10) || 1, 1);
 
@@ -44,7 +48,68 @@ const getStaffDetails = async (staffId) => {
   return staff;
 };
 
+/* =======================
+   FA LIST
+======================= */
+
+const getFAList = async () => {
+  const rows = await buildFAListQuery();
+
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth() + 1;
+
+  const unique = new Map();
+
+  rows.forEach((row) => {
+    const admissionYear = row.regno.substring(0, 4);
+    const deptCode = row.regno.substring(4, 7);
+
+    const key = `${admissionYear}-${deptCode}`;
+
+    if (!unique.has(key)) {
+      let academicYear = currentYear - Number(admissionYear);
+
+      if (currentMonth > 6) {
+        academicYear++;
+      }
+
+      let year = "-";
+
+      switch (academicYear) {
+        case 1:
+          year = "I Year";
+          break;
+        case 2:
+          year = "II Year";
+          break;
+        case 3:
+          year = "III Year";
+          break;
+        case 4:
+          year = "IV Year";
+          break;
+      }
+
+      unique.set(key, {
+        year,
+        department:
+          deptCode === "506"
+            ? "IT"
+            : deptCode === "510"
+            ? "AIDS"
+            : deptCode,
+        faName: row.staffname,
+        faNumber: row.mobileno,
+        faEmail: row.emailid,
+      });
+    }
+  });
+
+  return [...unique.values()];
+};
 module.exports = {
   getStaffList,
   getStaffDetails,
+  getFAList,
 };
