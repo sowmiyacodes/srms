@@ -5,23 +5,23 @@ const router = express.Router();
 const staffController = require("../controllers/staff.controller");
 
 router.get(
-    "/faculty",
-    staffController.getFacultyList
+  "/faculty",
+  staffController.getFacultyList
 );
 
 router.get(
-    "/fa",
-    staffController.getFAList
+  "/fa",
+  staffController.getFAList
 );
 
 router.get(
-    "/",
-    staffController.getStaffList
+  "/",
+  staffController.getStaffList
 );
 
 router.get(
-    "/:id",
-    staffController.getStaffDetails
+  "/:id",
+  staffController.getStaffDetails
 );
 
 console.log("Staff routes loaded");
