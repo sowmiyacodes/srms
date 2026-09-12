@@ -9,7 +9,8 @@ const buildStaffDetailQuery = (staffId) => {
       "s.emailid",
       "s.mobileno",
       "s.departmentid",
-      "s.designation"
+      "s.designation",
+      "s.staff_web_page"
     )
     .where("s.staffid", staffId)
     .first();

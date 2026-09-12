@@ -15,4 +15,20 @@ export const studentApi = {
     );
     return api.get('/v1/students', { params: cleanParams });
   },
+
+  getFAStudents: async (faId, yearNumber, branchId) => {
+
+    const response = await api.get(
+        `/staff/fa/${faId}/students`,
+        {
+            params: {
+                yearNumber,
+                branchId
+            }
+        }
+    );
+
+    return response.data;
+},
+
 };
