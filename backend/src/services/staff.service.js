@@ -10,6 +10,10 @@ const {
   buildFAListQuery,
 } = require("../queries/staff/faListQuery");
 
+const {
+    buildFAStudentsQuery
+} = require("../queries/staff/faStudentsQuery");
+
 const getStaffList = async (filters = {}) => {
   const page = Math.max(parseInt(filters.page, 10) || 1, 1);
 
@@ -54,8 +58,20 @@ const getFAList = async () => {
   return rows;
 };
 
+const getFAStudents = async (faId, yearNumber, branchId) => {
+
+    const students = await buildFAStudentsQuery(
+        faId,
+        yearNumber,
+        branchId
+    );
+
+    return students;
+};
+
 module.exports = {
   getStaffList,
   getStaffDetails,
   getFAList,
+  getFAStudents,
 };
