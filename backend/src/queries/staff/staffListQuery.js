@@ -20,7 +20,8 @@ const buildStaffListQuery = (filters = {}) => {
       "s.mobileno",
       "s.departmentid",
       "s.designation",
-      "s.staff_web_page"
+      "s.staff_web_page",
+      "s.roles"
     )
     .orderBy("s.staffname", "asc")
     .limit(pageSize)

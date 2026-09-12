@@ -8,7 +8,8 @@ import {
   Eye,
   Pencil,
   Trash2,
-  GraduationCap,
+  FolderKanban,
+  ClipboardList
 } from "lucide-react";
 import { getStaffList } from "../api/staff.api";
 import StaffDetailsModal from "../components/staff/StaffDetailsModal";
@@ -458,7 +459,7 @@ export default function StaffManagement({ currentUser }) {
 
                       <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                         Role
-                       </th>
+                      </th>
 
                       <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                         Designation
@@ -512,8 +513,8 @@ export default function StaffManagement({ currentUser }) {
                           </td>
 
                           <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
-                             {member.roles || "-"}
-                           </td>
+                            {member.roles || "-"}
+                          </td>
 
                           <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
                             {member.designation || "-"}
@@ -541,11 +542,12 @@ export default function StaffManagement({ currentUser }) {
                                     staffname: member.staffname,
                                   })
                                 }
-                                className="inline-flex items-center justify-center rounded-lg border border-purple-200 px-3 py-2 text-sm font-medium text-purple-600 transition hover:bg-purple-50"
+                                className="inline-flex items-center gap-2 rounded-lg border border-purple-200 px-3 py-2 text-sm font-medium text-purple-600 transition hover:bg-purple-50"
                               >
+                                <ClipboardList size={16}/>
+
                                 Project
                               </button>
-
                               {/* Edit/Delete - Admin only */}
                               {isAdmin && (
                                 <>
