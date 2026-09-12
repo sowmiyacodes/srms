@@ -1,5 +1,6 @@
 const knex = require("../config/db");
 const staffService = require("../services/staff.service");
+const projectStudentsService = require("../services/projectStudents.service");
 
 async function getFacultyList(req, res, next) {
   try {
@@ -54,9 +55,33 @@ async function getFAList(req, res, next) {
   }
 }
 
+async function getProjectStudents(req, res, next) {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Staff ID is required",
+      });
+    }
+
+    const students =
+      await projectStudentsService.getProjectStudentsByStaff(id);
+
+    res.json({
+      success: true,
+      data: students,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getFacultyList,
   getStaffList,
   getStaffDetails,
   getFAList,
+  getProjectStudents
 };
