@@ -8,10 +8,13 @@ import {
   Eye,
   Pencil,
   Trash2,
+  GraduationCap,
 } from "lucide-react";
 import { getStaffList } from "../api/staff.api";
 import StaffDetailsModal from "../components/staff/StaffDetailsModal";
 import FAManagement from "../components/staff/FAManagement";
+import ProjectStudentsModal from "../components/staff/ProjectStudentsModal";
+
 export default function StaffManagement({ currentUser }) {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,6 +35,8 @@ export default function StaffManagement({ currentUser }) {
 
   const [selectedStaffId, setSelectedStaffId] = useState(null);
 
+  const [selectedProjectStaff, setSelectedProjectStaff] = useState(null);
+
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 10,
@@ -41,216 +46,200 @@ export default function StaffManagement({ currentUser }) {
   const isAdmin = currentUser?.role === "admin";
 
   const [studentPage, setStudentPage] = useState(1);
-const studentPageSize = 10;
+  const studentPageSize = 10;
 
-const [studentPagination, setStudentPagination] = useState({
-  page: 1,
-  pageSize: 10,
-  count: 0,
-});
-
-
-
-const handleCloseStudents = () => {
-  setSelectedFA(null);
-  setFAStudents([]);
-  setAllFAStudents([]);
-  setStudentsError("");
-  setStudentPage(1);
-
-  setStudentPagination({
+  const [studentPagination, setStudentPagination] = useState({
     page: 1,
-    pageSize: studentPageSize,
+    pageSize: 10,
     count: 0,
-    totalRecords: 0,
-    totalPages: 0,
   });
-};
 
-// =====================================================
-// DESIGNATION SORTING
-// =====================================================
-
-const designationOrder = {
-  professor: 1,
-  "associate professor": 2,
-  "assistant professor": 3,
-  "teaching fellow": 4,
-};
-
-const normalizeDesignation = (value) => {
-  return String(value || "")
-    .replace(/\u00A0/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase();
-};
-
-const getDesignationOrder = (designation) => {
-  const normalized = normalizeDesignation(designation);
-
-  return designationOrder[normalized] ?? 999;
-};
-
-const sortStaffByDesignation = (staffList) => {
-  return [...staffList].sort((a, b) => {
-    const orderA = getDesignationOrder(a.designation);
-    const orderB = getDesignationOrder(b.designation);
-
-    return orderA - orderB;
-  });
-};
-
-//   const handleFAClick = async (fa) => {
-//   try {
-//     setSelectedFA(fa);
-//     setStudentsLoading(true);
-//     setStudentsError("");
-//     setStudentPage(1);
-
-//     const response = await studentApi.getStudents({
-//       faId: fa.faId,
-//     });
-
-//     console.log("All students for FA:", response);
-
-//     const students = Array.isArray(response)
-//       ? response
-//       : Array.isArray(response?.data)
-//       ? response.data
-//       : [];
-
-//     // Store ALL students
-//     setAllFAStudents(students);
-
-//     // Show only first 10 students
-//     setFAStudents(students.slice(0, studentPageSize));
-
-//     // Calculate frontend pagination
-//     const totalRecords = students.length;
-//     const totalPages = Math.ceil(
-//       totalRecords / studentPageSize
-//     );
-
-//     setStudentPagination({
-//       page: 1,
-//       pageSize: studentPageSize,
-//       count: totalRecords,
-//       totalRecords,
-//       totalPages,
-//     });
-
-//   } catch (err) {
-//     console.error("Error fetching FA students:", err);
-
-//     setStudentsError(
-//       err?.response?.data?.message ||
-//         err?.message ||
-//         "Failed to load students."
-//     );
-
-//     setFAStudents([]);
-//     setAllFAStudents([]);
-
-//   } finally {
-//     setStudentsLoading(false);
-//   }
-// };
-
-const handleFAClick = async (fa) => {
-  try {
-    setSelectedFA(fa);
-    setStudentsLoading(true);
+  const handleCloseStudents = () => {
+    setSelectedFA(null);
+    setFAStudents([]);
+    setAllFAStudents([]);
     setStudentsError("");
     setStudentPage(1);
-
-    const response = await studentApi.getFAStudents(
-      fa.faId,
-      fa.year_number,
-      fa.branchid
-    );
-
-    console.log("FA students response:", response);
-
-    const students = Array.isArray(response)
-      ? response
-      : Array.isArray(response?.data)
-      ? response.data
-      : [];
-
-    // These students are already filtered by:
-    // FA + Year + Branch
-    setAllFAStudents(students);
-
-    // First 10 students
-    setFAStudents(
-      students.slice(0, studentPageSize)
-    );
-
-    const totalRecords = students.length;
-
-    const totalPages = Math.ceil(
-      totalRecords / studentPageSize
-    );
 
     setStudentPagination({
       page: 1,
       pageSize: studentPageSize,
-      count: totalRecords,
-      totalRecords,
+      count: 0,
+      totalRecords: 0,
+      totalPages: 0,
+    });
+  };
+
+  // =====================================================
+  // DESIGNATION SORTING
+  // =====================================================
+
+  const designationOrder = {
+    professor: 1,
+    "associate professor": 2,
+    "assistant professor": 3,
+    "teaching fellow": 4,
+  };
+
+  const normalizeDesignation = (value) => {
+    return String(value || "")
+      .replace(/\u00A0/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+  };
+
+  const getDesignationOrder = (designation) => {
+    const normalized = normalizeDesignation(designation);
+
+    return designationOrder[normalized] ?? 999;
+  };
+
+  const sortStaffByDesignation = (staffList) => {
+    return [...staffList].sort((a, b) => {
+      const orderA = getDesignationOrder(a.designation);
+      const orderB = getDesignationOrder(b.designation);
+
+      return orderA - orderB;
+    });
+  };
+
+  //   const handleFAClick = async (fa) => {
+  //   try {
+  //     setSelectedFA(fa);
+  //     setStudentsLoading(true);
+  //     setStudentsError("");
+  //     setStudentPage(1);
+
+  //     const response = await studentApi.getStudents({
+  //       faId: fa.faId,
+  //     });
+
+  //     console.log("All students for FA:", response);
+
+  //     const students = Array.isArray(response)
+  //       ? response
+  //       : Array.isArray(response?.data)
+  //       ? response.data
+  //       : [];
+
+  //     // Store ALL students
+  //     setAllFAStudents(students);
+
+  //     // Show only first 10 students
+  //     setFAStudents(students.slice(0, studentPageSize));
+
+  //     // Calculate frontend pagination
+  //     const totalRecords = students.length;
+  //     const totalPages = Math.ceil(
+  //       totalRecords / studentPageSize
+  //     );
+
+  //     setStudentPagination({
+  //       page: 1,
+  //       pageSize: studentPageSize,
+  //       count: totalRecords,
+  //       totalRecords,
+  //       totalPages,
+  //     });
+
+  //   } catch (err) {
+  //     console.error("Error fetching FA students:", err);
+
+  //     setStudentsError(
+  //       err?.response?.data?.message ||
+  //         err?.message ||
+  //         "Failed to load students."
+  //     );
+
+  //     setFAStudents([]);
+  //     setAllFAStudents([]);
+
+  //   } finally {
+  //     setStudentsLoading(false);
+  //   }
+  // };
+
+  const handleFAClick = async (fa) => {
+    try {
+      setSelectedFA(fa);
+      setStudentsLoading(true);
+      setStudentsError("");
+      setStudentPage(1);
+
+      const response = await studentApi.getFAStudents(
+        fa.faId,
+        fa.year_number,
+        fa.branchid,
+      );
+
+      console.log("FA students response:", response);
+
+      const students = Array.isArray(response)
+        ? response
+        : Array.isArray(response?.data)
+          ? response.data
+          : [];
+
+      // These students are already filtered by:
+      // FA + Year + Branch
+      setAllFAStudents(students);
+
+      // First 10 students
+      setFAStudents(students.slice(0, studentPageSize));
+
+      const totalRecords = students.length;
+
+      const totalPages = Math.ceil(totalRecords / studentPageSize);
+
+      setStudentPagination({
+        page: 1,
+        pageSize: studentPageSize,
+        count: totalRecords,
+        totalRecords,
+        totalPages,
+      });
+    } catch (err) {
+      console.error("Error fetching FA students:", err);
+
+      setStudentsError(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to load students.",
+      );
+
+      setFAStudents([]);
+      setAllFAStudents([]);
+    } finally {
+      setStudentsLoading(false);
+    }
+  };
+
+  const handleStudentPageChange = (newPage) => {
+    const totalPages = Math.ceil(allFAStudents.length / studentPageSize);
+
+    if (newPage < 1 || newPage > totalPages) {
+      return;
+    }
+
+    const startIndex = (newPage - 1) * studentPageSize;
+
+    const endIndex = startIndex + studentPageSize;
+
+    const pageStudents = allFAStudents.slice(startIndex, endIndex);
+
+    setFAStudents(pageStudents);
+
+    setStudentPage(newPage);
+
+    setStudentPagination({
+      page: newPage,
+      pageSize: studentPageSize,
+      count: allFAStudents.length,
+      totalRecords: allFAStudents.length,
       totalPages,
     });
-
-  } catch (err) {
-    console.error("Error fetching FA students:", err);
-
-    setStudentsError(
-      err?.response?.data?.message ||
-        err?.message ||
-        "Failed to load students."
-    );
-
-    setFAStudents([]);
-    setAllFAStudents([]);
-  } finally {
-    setStudentsLoading(false);
-  }
-};
-
-const handleStudentPageChange = (newPage) => {
-  const totalPages = Math.ceil(
-    allFAStudents.length / studentPageSize
-  );
-
-  if (newPage < 1 || newPage > totalPages) {
-    return;
-  }
-
-  const startIndex =
-    (newPage - 1) * studentPageSize;
-
-  const endIndex =
-    startIndex + studentPageSize;
-
-  const pageStudents = allFAStudents.slice(
-    startIndex,
-    endIndex
-  );
-
-  setFAStudents(pageStudents);
-
-  setStudentPage(newPage);
-
-  setStudentPagination({
-    page: newPage,
-    pageSize: studentPageSize,
-    count: allFAStudents.length,
-    totalRecords: allFAStudents.length,
-    totalPages,
-  });
-};
-
-
+  };
 
   const fetchStaff = async () => {
     try {
@@ -268,8 +257,8 @@ const handleStudentPageChange = (newPage) => {
       const staffData = Array.isArray(response)
         ? response
         : Array.isArray(response?.data)
-        ? response.data
-        : [];
+          ? response.data
+          : [];
 
       setStaff(staffData);
 
@@ -278,7 +267,7 @@ const handleStudentPageChange = (newPage) => {
           page,
           pageSize,
           count: staffData.length,
-        }
+        },
       );
     } catch (err) {
       console.error("Error fetching staff:", err);
@@ -286,7 +275,7 @@ const handleStudentPageChange = (newPage) => {
       setError(
         err?.message ||
           err?.response?.data?.message ||
-          "Failed to load staff details."
+          "Failed to load staff details.",
       );
 
       setStaff([]);
@@ -297,14 +286,12 @@ const handleStudentPageChange = (newPage) => {
 
   useEffect(() => {
     fetchStaff();
-  }, [page, search]); 
+  }, [page, search]);
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
     setPage(1);
   };
-
-  
 
   const canGoPrevious = page > 1;
   const canGoNext = staff.length === pageSize;
@@ -319,48 +306,41 @@ const handleStudentPageChange = (newPage) => {
     // Delete functionality will be added next
   };
 
-// =====================================================
-// DESIGNATION DROPDOWN
-// =====================================================
+  // =====================================================
+  // DESIGNATION DROPDOWN
+  // =====================================================
 
-const designationOptions = [
-  ...new Set(
-    staff
-      .map((member) => member.designation)
-      .filter(Boolean)
-  ),
-].sort((a, b) => {
-  const orderA = getDesignationOrder(a);
-  const orderB = getDesignationOrder(b);
+  const designationOptions = [
+    ...new Set(staff.map((member) => member.designation).filter(Boolean)),
+  ].sort((a, b) => {
+    const orderA = getDesignationOrder(a);
+    const orderB = getDesignationOrder(b);
 
-  if (orderA !== orderB) {
-    return orderA - orderB;
-  }
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
 
-  // Alphabetical only for "Others"
-  return String(a).localeCompare(String(b));
-});
-// =====================================================
-// FILTER + SORT
-// =====================================================
-
-const filteredStaff = staff
-  .filter((member) => {
-    const matchesDesignation =
-      designation === "" ||
-      normalizeDesignation(member.designation) ===
-        normalizeDesignation(designation);
-
-    return matchesDesignation;
-  })
-  .sort((a, b) => {
-    return (
-      getDesignationOrder(a.designation) -
-      getDesignationOrder(b.designation)
-    );
+    // Alphabetical only for "Others"
+    return String(a).localeCompare(String(b));
   });
+  // =====================================================
+  // FILTER + SORT
+  // =====================================================
 
+  const filteredStaff = staff
+    .filter((member) => {
+      const matchesDesignation =
+        designation === "" ||
+        normalizeDesignation(member.designation) ===
+          normalizeDesignation(designation);
 
+      return matchesDesignation;
+    })
+    .sort((a, b) => {
+      return (
+        getDesignationOrder(a.designation) - getDesignationOrder(b.designation)
+      );
+    });
 
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-8 md:px-10">
@@ -383,7 +363,7 @@ const filteredStaff = staff
             </div>
           </div>
         </div>
-                {/* Tabs */}
+        {/* Tabs */}
         <div className="mb-6 flex gap-3">
           <button
             onClick={() => setActiveTab("staff")}
@@ -410,237 +390,251 @@ const filteredStaff = staff
           </button>
         </div>
         {activeTab === "staff" ? (
-  <>
-        {/* Search */}
-        <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-  <div className="flex items-center justify-between gap-4">
-    {/* Search Box */}
-    <div className="relative flex-1 max-w-md">
-      <Search
-        size={19}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-      />
+          <>
+            {/* Search */}
+            <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="flex items-center justify-between gap-4">
+                {/* Search Box */}
+                <div className="relative flex-1 max-w-md">
+                  <Search
+                    size={19}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  />
 
-      <input
-        type="text"
-        value={search}
-        onChange={handleSearchChange}
-        placeholder="Search by name, code or email..."
-        className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-      />
-    </div>
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={handleSearchChange}
+                    placeholder="Search by name, code or email..."
+                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  />
+                </div>
 
-    {/* Designation Filter */}
-    <select
-      value={designation}
-      onChange={(e) => setDesignation(e.target.value)}
-      className="w-56 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-    >
-      <option value="">All Designations</option>
+                {/* Designation Filter */}
+                <select
+                  value={designation}
+                  onChange={(e) => setDesignation(e.target.value)}
+                  className="w-56 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                >
+                  <option value="">All Designations</option>
 
-      {designationOptions.map((item) => (
-        <option key={item} value={item}>
-          {item}
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
-
-        {/* Error */}
-        {error && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-            {error}
-          </div>
-        )}
-
-        {/* Table */}
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="border-b border-slate-200 bg-slate-50">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Staff Code
-                  </th>
-
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Staff Name
-                  </th>
-
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Email
-                  </th>
-
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Mobile
-                  </th>
-
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Department
-                  </th>
-
-                  <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Designation
-                  </th>
-
-                  <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-slate-100">
-                {loading ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-6 py-12 text-center text-sm text-slate-500"
-                    >
-                      Loading staff details...
-                    </td>
-                  </tr>
-                ) : staff.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={7}
-                      className="px-6 py-12 text-center text-sm text-slate-500"
-                    >
-                      No staff records found.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredStaff.map((member) => (
-                    <tr
-                      key={member.staffid}
-                      className="transition hover:bg-slate-50"
-                    >
-                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-700">
-                        {member.staffcode || "-"}
-                      </td>
-
-                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">
-                        {member.staffname || "-"}
-                      </td>
-
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
-                        {member.emailid || "-"}
-                      </td>
-
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
-                        {member.mobileno || "-"}
-                      </td>
-
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
-                        {member.departmentid || "-"}
-                      </td>
-
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
-                        {member.designation || "-"}
-                      </td>
-
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-center gap-2">
-                          {/* View - both HOD and Admin */}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSelectedStaffId(member.staffid)
-                            }
-                            className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
-                          >
-                            <Eye size={16} />
-                            View
-                          </button>
-
-                          {/* Edit/Delete - Admin only */}
-                          {isAdmin && (
-                            <>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleEdit(member.staffid)
-                                }
-                                className="inline-flex items-center justify-center rounded-lg border border-amber-200 p-2 text-amber-600 transition hover:bg-amber-50"
-                                title="Edit staff"
-                              >
-                                <Pencil size={16} />
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  handleDelete(member.staffid)
-                                }
-                                className="inline-flex items-center justify-center rounded-lg border border-red-200 p-2 text-red-600 transition hover:bg-red-50"
-                                title="Delete staff"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4">
-            <p className="text-sm text-slate-500">
-              Page {pagination.page}
-            </p>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setPage((prev) => prev - 1)}
-                disabled={!canGoPrevious || loading}
-                className="flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                <ChevronLeft size={17} />
-                Previous
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setPage((prev) => prev + 1)}
-                disabled={!canGoNext || loading}
-                className="flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Next
-                <ChevronRight size={17} />
-              </button>
+                  {designationOptions.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
-        </div>
-      
+
+            {/* Error */}
+            {error && (
+              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
+            {/* Table */}
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="border-b border-slate-200 bg-slate-50">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Staff Code
+                      </th>
+
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Staff Name
+                      </th>
+
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Email
+                      </th>
+
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Mobile
+                      </th>
+
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Department
+                      </th>
+
+                      <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Designation
+                      </th>
+
+                      <th className="px-6 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody className="divide-y divide-slate-100">
+                    {loading ? (
+                      <tr>
+                        <td
+                          colSpan={7}
+                          className="px-6 py-12 text-center text-sm text-slate-500"
+                        >
+                          Loading staff details...
+                        </td>
+                      </tr>
+                    ) : staff.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={7}
+                          className="px-6 py-12 text-center text-sm text-slate-500"
+                        >
+                          No staff records found.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredStaff.map((member) => (
+                        <tr
+                          key={member.staffid}
+                          className="transition hover:bg-slate-50"
+                        >
+                          <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-700">
+                            {member.staffcode || "-"}
+                          </td>
+
+                          <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">
+                            {member.staffname || "-"}
+                          </td>
+
+                          <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
+                            {member.emailid || "-"}
+                          </td>
+
+                          <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
+                            {member.mobileno || "-"}
+                          </td>
+
+                          <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
+                            {member.departmentid || "-"}
+                          </td>
+
+                          <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
+                            {member.designation || "-"}
+                          </td>
+
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-center gap-2">
+                              {/* View - both HOD and Admin */}
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setSelectedStaffId(member.staffid)
+                                }
+                                className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
+                              >
+                                <Eye size={16} />
+                                View
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setSelectedProjectStaff({
+                                    staffid: member.staffid,
+                                    staffname: member.staffname,
+                                  })
+                                }
+                                className="inline-flex items-center justify-center rounded-lg border border-purple-200 px-3 py-2 text-sm font-medium text-purple-600 transition hover:bg-purple-50"
+                              >
+                                Project
+                              </button>
+
+                              {/* Edit/Delete - Admin only */}
+                              {isAdmin && (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEdit(member.staffid)}
+                                    className="inline-flex items-center justify-center rounded-lg border border-amber-200 p-2 text-amber-600 transition hover:bg-amber-50"
+                                    title="Edit staff"
+                                  >
+                                    <Pencil size={16} />
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDelete(member.staffid)}
+                                    className="inline-flex items-center justify-center rounded-lg border border-red-200 p-2 text-red-600 transition hover:bg-red-50"
+                                    title="Delete staff"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination */}
+              <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4">
+                <p className="text-sm text-slate-500">Page {pagination.page}</p>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPage((prev) => prev - 1)}
+                    disabled={!canGoPrevious || loading}
+                    className="flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <ChevronLeft size={17} />
+                    Previous
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPage((prev) => prev + 1)}
+                    disabled={!canGoNext || loading}
+                    className="flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Next
+                    <ChevronRight size={17} />
+                  </button>
+                </div>
+              </div>
+            </div>
 
             {/* Staff Details Modal */}
-      {selectedStaffId && (
-        <StaffDetailsModal
-          staffId={selectedStaffId}
-          onClose={() => setSelectedStaffId(null)}
-        />
-      )}
-      </>
-    ) : (
-   <FAManagement
-  onFAClick={handleFAClick}
-  onCloseStudents={handleCloseStudents}
-  selectedFA={selectedFA}
-  faStudents={faStudents}
-  studentsLoading={studentsLoading}
-  studentsError={studentsError}
-  studentPage={studentPage}
-  studentPagination={studentPagination}
-  onStudentPageChange={handleStudentPageChange}
-/>
-    )}
-    </div>
+            {selectedStaffId && (
+              <StaffDetailsModal
+                staffId={selectedStaffId}
+                onClose={() => setSelectedStaffId(null)}
+              />
+            )}
+
+            {selectedProjectStaff && (
+              <ProjectStudentsModal
+                staffId={selectedProjectStaff.staffid}
+                staffName={selectedProjectStaff.staffname}
+                onClose={() => setSelectedProjectStaff(null)}
+              />
+            )}
+          </>
+        ) : (
+          <FAManagement
+            onFAClick={handleFAClick}
+            onCloseStudents={handleCloseStudents}
+            selectedFA={selectedFA}
+            faStudents={faStudents}
+            studentsLoading={studentsLoading}
+            studentsError={studentsError}
+            studentPage={studentPage}
+            studentPagination={studentPagination}
+            onStudentPageChange={handleStudentPageChange}
+          />
+        )}
+      </div>
     </div>
   );
 }
