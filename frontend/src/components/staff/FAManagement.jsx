@@ -2,7 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, ArrowUpDown } from "lucide-react";
 import { getFAList } from "../../api/staff.api";
 
-export default function FAManagement() {
+export default function FAManagement({
+  onFAClick,
+  onCloseStudents,
+  selectedFA,
+  faStudents,
+  studentsLoading,
+  studentsError,
+  studentPage,
+  studentPagination,
+  onStudentPageChange,
+}) {
   const [faList, setFAList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -10,6 +20,8 @@ export default function FAManagement() {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState("year_number");
   const [sortOrder, setSortOrder] = useState("asc");
+
+  
 
   // =========================================================
   // FETCH FA + MCC DATA
@@ -630,10 +642,13 @@ export default function FAManagement() {
                                     </span>
 
                                     <div className="min-w-0">
-                                      <div className="text-sm font-semibold text-slate-900">
-                                        {item.faName ||
-                                          "-"}
-                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => onFAClick(item)}
+                                        className="text-left text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline"
+                                      >
+                                        {item.faName || "-"}
+                                      </button>
 
                                       <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-slate-400">
                                         FA{" "}
@@ -685,6 +700,420 @@ export default function FAManagement() {
           </div>
         </div>
       )}
+
+      
+     {/* =====================================================
+    STUDENT MODAL
+====================================================== */}
+
+{selectedFA && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    
+    {/* =================================================
+        BACKGROUND OVERLAY
+    ================================================== */}
+    <div
+      className="
+        absolute inset-0
+        bg-slate-900/40
+        backdrop-blur-sm
+        transition-opacity
+        duration-200
+      "
+      onClick={onCloseStudents}
+    />
+
+    {/* =================================================
+        MODAL
+    ================================================== */}
+    <div
+      className="
+        relative z-10
+        flex max-h-[90vh] w-full max-w-6xl
+        flex-col
+        overflow-hidden
+        rounded-2xl
+        bg-white
+        shadow-2xl
+        animate-in
+        fade-in
+        zoom-in-95
+        duration-200
+      "
+    >
+
+      {/* =================================================
+          HEADER
+      ================================================== */}
+
+      <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
+        
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">
+            Students of {selectedFA.faName || "Faculty Advisor"}
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Faculty Advisor ID: {selectedFA.faId}
+          </p>
+        </div>
+
+        {/* Close button */}
+        <button
+          type="button"
+          onClick={onCloseStudents}
+          className="
+            flex h-9 w-9
+            items-center justify-center
+            rounded-lg
+            text-slate-500
+            transition-all
+            duration-150
+            hover:bg-slate-100
+            hover:text-slate-800
+            active:scale-95
+          "
+          aria-label="Close"
+        >
+          ✕
+        </button>
+      </div>
+
+
+      {/* =================================================
+          CONTENT
+      ================================================== */}
+
+      <div className="relative overflow-y-auto p-6">
+
+        {/* ---------------------------------------------
+            INITIAL LOADING
+        ---------------------------------------------- */}
+
+        {studentsLoading && faStudents.length === 0 ? (
+          <div className="flex min-h-[300px] items-center justify-center">
+            <div className="flex items-center gap-3 text-sm text-slate-500">
+              
+              <div
+                className="
+                  h-5 w-5
+                  animate-spin
+                  rounded-full
+                  border-2
+                  border-slate-300
+                  border-t-slate-700
+                "
+              />
+
+              Loading students...
+            </div>
+          </div>
+
+        ) : studentsError ? (
+
+          /* ---------------------------------------------
+              ERROR
+          ---------------------------------------------- */
+
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {studentsError}
+          </div>
+
+        ) : faStudents.length === 0 ? (
+
+          /* ---------------------------------------------
+              NO STUDENTS
+          ---------------------------------------------- */
+
+          <div className="flex min-h-[300px] items-center justify-center">
+            <p className="text-sm text-slate-500">
+              No students found for this Faculty Advisor.
+            </p>
+          </div>
+
+        ) : (
+
+          /* ---------------------------------------------
+              STUDENT TABLE
+          ---------------------------------------------- */
+
+          <div className="relative overflow-x-auto rounded-lg border border-slate-200">
+
+            {/* =========================================
+                PAGE LOADING OVERLAY
+
+                IMPORTANT:
+                The table stays visible while the next
+                page is loading.
+            ========================================== */}
+
+            {studentsLoading && (
+              <div
+                className="
+                  absolute inset-0 z-20
+                  flex items-center justify-center
+                  bg-white/60
+                  backdrop-blur-[1px]
+                  transition-opacity
+                  duration-150
+                "
+              >
+                <div
+                  className="
+                    flex items-center gap-3
+                    rounded-lg
+                    bg-white
+                    px-4 py-3
+                    shadow-md
+                  "
+                >
+                  <div
+                    className="
+                      h-4 w-4
+                      animate-spin
+                      rounded-full
+                      border-2
+                      border-slate-300
+                      border-t-slate-700
+                    "
+                  />
+
+                  <span className="text-sm text-slate-600">
+                    Loading...
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* =========================================
+                TABLE
+            ========================================== */}
+
+            <table className="min-w-full">
+
+              {/* TABLE HEADER */}
+
+              <thead className="border-b border-slate-200 bg-slate-50">
+                <tr>
+
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    #
+                  </th>
+
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Student Name
+                  </th>
+
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Register Number
+                  </th>
+
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Email
+                  </th>
+
+                  <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    Mobile
+                  </th>
+
+                </tr>
+              </thead>
+
+
+              {/* TABLE BODY */}
+
+              <tbody className="divide-y divide-slate-100">
+
+                {faStudents.map((student, index) => (
+
+                  <tr
+                    key={
+                      student.id ||
+                      student.studentid ||
+                      student.register_number ||
+                      index
+                    }
+                    className="
+                      transition-colors
+                      duration-150
+                      hover:bg-slate-50
+                    "
+                  >
+
+                    {/* NUMBER */}
+
+                    <td className="px-5 py-4 text-sm text-slate-500">
+                      {(studentPage - 1) *
+                        studentPagination.pageSize +
+                        index +
+                        1}
+                    </td>
+
+
+                    {/* STUDENT NAME */}
+
+                    <td className="px-5 py-4 text-sm font-medium text-slate-900">
+                      {student.name ||
+                        student.studentname ||
+                        "-"}
+                    </td>
+
+
+                    {/* REGISTER NUMBER */}
+
+                    <td className="px-5 py-4 text-sm text-slate-600">
+                      {student.register_number ||
+                        student.registerNumber ||
+                        student.regno ||
+                        student.reg_no ||
+                        "-"}
+                    </td>
+
+
+                    {/* EMAIL */}
+
+                    <td className="px-5 py-4 text-sm text-slate-600">
+                      {student.email ||
+                        student.emailid ||
+                        "-"}
+                    </td>
+
+
+                    {/* MOBILE */}
+
+                    <td className="px-5 py-4 text-sm text-slate-600">
+                      {student.mobile ||
+                        student.mobileno ||
+                        student.phone ||
+                        "-"}
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+        )}
+
+      </div>
+
+
+      {/* =================================================
+          PAGINATION
+      ================================================== */}
+
+      {!studentsError &&
+        faStudents.length > 0 && (
+          <div
+            className="
+              flex items-center justify-between
+              border-t border-slate-200
+              px-6 py-4
+            "
+          >
+
+            {/* PAGE INFORMATION */}
+
+            <p className="text-sm text-slate-500">
+              Page {studentPagination.page || studentPage}
+            </p>
+
+
+            {/* PAGINATION BUTTONS */}
+
+            <div className="flex items-center gap-2">
+
+              {/* -----------------------------------------
+                  PREVIOUS
+              ------------------------------------------ */}
+
+              <button
+                type="button"
+                onClick={() =>
+                  onStudentPageChange(studentPage - 1)
+                }
+                disabled={
+                  studentPage <= 1 ||
+                  studentsLoading
+                }
+                className="
+                  rounded-lg
+                  border border-slate-300
+                  px-4 py-2
+                  text-sm font-medium
+                  text-slate-600
+                  transition-all
+                  duration-150
+                  hover:bg-slate-50
+                  active:scale-95
+                  disabled:cursor-not-allowed
+                  disabled:opacity-40
+                "
+              >
+                Previous
+              </button>
+
+
+              {/* -----------------------------------------
+                  CURRENT PAGE
+              ------------------------------------------ */}
+
+              <span
+                className="
+                  min-w-[40px]
+                  px-3
+                  py-2
+                  text-center
+                  text-sm
+                  font-semibold
+                  text-slate-700
+                "
+              >
+                {studentPage}
+              </span>
+
+
+              {/* -----------------------------------------
+                  NEXT
+              ------------------------------------------ */}
+
+              <button
+  type="button"
+  onClick={() =>
+    onStudentPageChange(studentPage + 1)
+  }
+  disabled={
+    studentPage >= (studentPagination.totalPages || 1) ||
+    studentsLoading
+  }
+  className="
+    rounded-lg
+    border border-slate-300
+    px-4 py-2
+    text-sm font-medium
+    text-slate-600
+    transition-all
+    duration-150
+    hover:bg-slate-50
+    active:scale-95
+    disabled:cursor-not-allowed
+    disabled:opacity-40
+  "
+>
+  Next
+</button>
+
+            </div>
+          </div>
+        )}
+
+    </div>
+  </div>
+)}
     </div>
   );
 }
