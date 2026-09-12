@@ -12,20 +12,21 @@ const buildStaffListQuery = (filters = {}) => {
   const offset = (page - 1) * pageSize;
 
   const query = db("staff as s")
-    .select(
-      "s.staffid",
-      "s.staffcode",
-      "s.staffname",
-      "s.emailid",
-      "s.mobileno",
-      "s.departmentid",
-      "s.designation",
-      "s.staff_web_page",
-      "s.roles"
-    )
-    .orderBy("s.staffname", "asc")
-    .limit(pageSize)
-    .offset(offset);
+  .select(
+    "s.staffid",
+    "s.staffcode",
+    "s.staffname",
+    "s.emailid",
+    "s.mobileno",
+    "s.departmentid",
+    "s.designation",
+    "s.staff_web_page",
+    "s.roles"
+  )
+  .whereNot("s.designation", "Guest Faculty")
+  .orderBy("s.staffname", "asc")
+  .limit(pageSize)
+  .offset(offset);
 
   if (search) {
     query.where(function () {
