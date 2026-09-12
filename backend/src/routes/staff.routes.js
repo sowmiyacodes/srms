@@ -20,6 +20,11 @@ router.get(
 );
 
 router.get(
+  "/:id/project-students",
+  staffController.getProjectStudents
+);
+
+router.get(
   "/:id",
   staffController.getStaffDetails
 );
