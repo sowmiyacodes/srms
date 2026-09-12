@@ -457,8 +457,8 @@ export default function StaffManagement({ currentUser }) {
                       </th>
 
                       <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Department
-                      </th>
+                        Role
+                       </th>
 
                       <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                         Designation
@@ -512,8 +512,8 @@ export default function StaffManagement({ currentUser }) {
                           </td>
 
                           <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
-                            {member.departmentid || "-"}
-                          </td>
+                             {member.roles || "-"}
+                           </td>
 
                           <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
                             {member.designation || "-"}

@@ -6,6 +6,7 @@ import {
   Phone,
   Briefcase,
   Globe,
+  Shield,
 } from "lucide-react";
 import { getStaffDetails } from "../../api/staff.api";
 
@@ -138,7 +139,24 @@ export default function StaffDetailsModal({ staffId, onClose }) {
                   </div>
                 </div>
               </div>
+                <div className="rounded-xl bg-slate-50 p-5">
+  <div className="flex items-center gap-3">
+    <Shield
+      size={20}
+      className="text-blue-600"
+    />
 
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        Role
+      </p>
+
+      <p className="mt-1 font-semibold text-slate-900">
+        {staff.roles || "-"}
+      </p>
+    </div>
+  </div>
+</div>
               {/* Email */}
               <div className="rounded-xl bg-slate-50 p-5">
                 <div className="flex items-center gap-3">
