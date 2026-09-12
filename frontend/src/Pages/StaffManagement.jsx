@@ -11,13 +11,16 @@ import {
   FolderKanban,
   ClipboardList
 } from "lucide-react";
-import { getStaffList } from "../api/staff.api";
+import { getStaffList, getGuestFacultyList } from "../api/staff.api";
 import StaffDetailsModal from "../components/staff/StaffDetailsModal";
 import FAManagement from "../components/staff/FAManagement";
 import ProjectStudentsModal from "../components/staff/ProjectStudentsModal";
 
 export default function StaffManagement({ currentUser }) {
   const [staff, setStaff] = useState([]);
+  const [guestFaculty, setGuestFaculty] = useState([]);
+  const [guestFacultyLoading, setGuestFacultyLoading] = useState(false);
+  const [guestFacultyError, setGuestFacultyError] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -285,9 +288,41 @@ export default function StaffManagement({ currentUser }) {
     }
   };
 
+  const fetchGuestFaculty = async () => {
+    try {
+      setGuestFacultyLoading(true);
+      setGuestFacultyError("");
+
+      const response = await getGuestFacultyList();
+      const data = Array.isArray(response)
+        ? response
+        : Array.isArray(response?.data)
+          ? response.data
+          : [];
+
+      setGuestFaculty(data);
+    } catch (err) {
+      console.error("Error fetching guest faculty:", err);
+      setGuestFacultyError(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to load guest faculty details."
+      );
+      setGuestFaculty([]);
+    } finally {
+      setGuestFacultyLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchStaff();
   }, [page, search]);
+
+  useEffect(() => {
+    if (activeTab === "guestFaculty" && guestFaculty.length === 0) {
+      fetchGuestFaculty();
+    }
+  }, [activeTab]);
 
   const handleSearchChange = (event) => {
     setSearch(event.target.value);
@@ -388,6 +423,18 @@ export default function StaffManagement({ currentUser }) {
               }`}
           >
             FA
+          </button>
+
+          <button
+            onClick={() => setActiveTab("guestFaculty")}
+            className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition
+              ${
+                activeTab === "guestFaculty"
+                  ? "bg-blue-600 text-white shadow"
+                  : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
+              }`}
+          >
+            Guest Faculty
           </button>
         </div>
         {activeTab === "staff" ? (
@@ -623,7 +670,7 @@ export default function StaffManagement({ currentUser }) {
               />
             )}
           </>
-        ) : (
+        ) : activeTab === "fa" ? (
           <FAManagement
             onFAClick={handleFAClick}
             onCloseStudents={handleCloseStudents}
@@ -635,6 +682,79 @@ export default function StaffManagement({ currentUser }) {
             studentPagination={studentPagination}
             onStudentPageChange={handleStudentPageChange}
           />
+        ) : (
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            {guestFacultyError && (
+              <div className="m-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                {guestFacultyError}
+              </div>
+            )}
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead className="border-b border-slate-200 bg-slate-50">
+                  <tr>
+                    {['Staff Code', 'Staff Name', 'Email', 'Mobile', 'Action'].map((heading) => (
+                      <th key={heading} className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{heading}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {guestFacultyLoading ? (
+                    <tr><td colSpan={5} className="px-6 py-12 text-center text-sm text-slate-500">Loading guest faculty details...</td></tr>
+                  ) : guestFaculty.length === 0 ? (
+                    <tr><td colSpan={5} className="px-6 py-12 text-center text-sm text-slate-500">No guest faculty records found.</td></tr>
+                  ) : guestFaculty.map((member) => (
+                    <tr key={member.staffid} className="transition hover:bg-slate-50">
+                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-700">{member.staffcode || "-"}</td>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">{member.staffname || "-"}</td>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">{member.emailid || "-"}</td>
+                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">{member.mobileno || "-"}</td>
+                      <td className="px-6 py-4"><div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedStaffId(member.staffid)}
+                          className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
+                        >
+                          <Eye size={16} />
+                          View
+                        </button>
+
+                        {isAdmin && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => handleEdit(member.staffid)}
+                              className="inline-flex items-center justify-center rounded-lg border border-amber-200 p-2 text-amber-600 transition hover:bg-amber-50"
+                              title="Edit staff"
+                            >
+                              <Pencil size={16} />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(member.staffid)}
+                              className="inline-flex items-center justify-center rounded-lg border border-red-200 p-2 text-red-600 transition hover:bg-red-50"
+                              title="Delete staff"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        )}
+                      </div></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Guest Faculty Details Modal */}
+            {selectedStaffId && (
+              <StaffDetailsModal
+                staffId={selectedStaffId}
+                onClose={() => setSelectedStaffId(null)}
+              />
+            )}
+          </div>
         )}
       </div>
     </div>
