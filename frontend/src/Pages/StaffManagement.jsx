@@ -1,3 +1,4 @@
+import { studentApi } from "../api/student.api";
 import React, { useEffect, useState } from "react";
 import {
   Search,
@@ -16,9 +17,16 @@ export default function StaffManagement({ currentUser }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const [allFAStudents, setAllFAStudents] = useState([]);
+
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 10;
+
+  const [selectedFA, setSelectedFA] = useState(null);
+  const [faStudents, setFAStudents] = useState([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [studentsError, setStudentsError] = useState("");
 
   const [designation, setDesignation] = useState("");
 
@@ -31,6 +39,218 @@ export default function StaffManagement({ currentUser }) {
   });
   const [activeTab, setActiveTab] = useState("staff");
   const isAdmin = currentUser?.role === "admin";
+
+  const [studentPage, setStudentPage] = useState(1);
+const studentPageSize = 10;
+
+const [studentPagination, setStudentPagination] = useState({
+  page: 1,
+  pageSize: 10,
+  count: 0,
+});
+
+
+
+const handleCloseStudents = () => {
+  setSelectedFA(null);
+  setFAStudents([]);
+  setAllFAStudents([]);
+  setStudentsError("");
+  setStudentPage(1);
+
+  setStudentPagination({
+    page: 1,
+    pageSize: studentPageSize,
+    count: 0,
+    totalRecords: 0,
+    totalPages: 0,
+  });
+};
+
+// =====================================================
+// DESIGNATION SORTING
+// =====================================================
+
+const designationOrder = {
+  professor: 1,
+  "associate professor": 2,
+  "assistant professor": 3,
+  "teaching fellow": 4,
+};
+
+const normalizeDesignation = (value) => {
+  return String(value || "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+};
+
+const getDesignationOrder = (designation) => {
+  const normalized = normalizeDesignation(designation);
+
+  return designationOrder[normalized] ?? 999;
+};
+
+const sortStaffByDesignation = (staffList) => {
+  return [...staffList].sort((a, b) => {
+    const orderA = getDesignationOrder(a.designation);
+    const orderB = getDesignationOrder(b.designation);
+
+    return orderA - orderB;
+  });
+};
+
+//   const handleFAClick = async (fa) => {
+//   try {
+//     setSelectedFA(fa);
+//     setStudentsLoading(true);
+//     setStudentsError("");
+//     setStudentPage(1);
+
+//     const response = await studentApi.getStudents({
+//       faId: fa.faId,
+//     });
+
+//     console.log("All students for FA:", response);
+
+//     const students = Array.isArray(response)
+//       ? response
+//       : Array.isArray(response?.data)
+//       ? response.data
+//       : [];
+
+//     // Store ALL students
+//     setAllFAStudents(students);
+
+//     // Show only first 10 students
+//     setFAStudents(students.slice(0, studentPageSize));
+
+//     // Calculate frontend pagination
+//     const totalRecords = students.length;
+//     const totalPages = Math.ceil(
+//       totalRecords / studentPageSize
+//     );
+
+//     setStudentPagination({
+//       page: 1,
+//       pageSize: studentPageSize,
+//       count: totalRecords,
+//       totalRecords,
+//       totalPages,
+//     });
+
+//   } catch (err) {
+//     console.error("Error fetching FA students:", err);
+
+//     setStudentsError(
+//       err?.response?.data?.message ||
+//         err?.message ||
+//         "Failed to load students."
+//     );
+
+//     setFAStudents([]);
+//     setAllFAStudents([]);
+
+//   } finally {
+//     setStudentsLoading(false);
+//   }
+// };
+
+const handleFAClick = async (fa) => {
+  try {
+    setSelectedFA(fa);
+    setStudentsLoading(true);
+    setStudentsError("");
+    setStudentPage(1);
+
+    const response = await studentApi.getFAStudents(
+      fa.faId,
+      fa.year_number,
+      fa.branchid
+    );
+
+    console.log("FA students response:", response);
+
+    const students = Array.isArray(response)
+      ? response
+      : Array.isArray(response?.data)
+      ? response.data
+      : [];
+
+    // These students are already filtered by:
+    // FA + Year + Branch
+    setAllFAStudents(students);
+
+    // First 10 students
+    setFAStudents(
+      students.slice(0, studentPageSize)
+    );
+
+    const totalRecords = students.length;
+
+    const totalPages = Math.ceil(
+      totalRecords / studentPageSize
+    );
+
+    setStudentPagination({
+      page: 1,
+      pageSize: studentPageSize,
+      count: totalRecords,
+      totalRecords,
+      totalPages,
+    });
+
+  } catch (err) {
+    console.error("Error fetching FA students:", err);
+
+    setStudentsError(
+      err?.response?.data?.message ||
+        err?.message ||
+        "Failed to load students."
+    );
+
+    setFAStudents([]);
+    setAllFAStudents([]);
+  } finally {
+    setStudentsLoading(false);
+  }
+};
+
+const handleStudentPageChange = (newPage) => {
+  const totalPages = Math.ceil(
+    allFAStudents.length / studentPageSize
+  );
+
+  if (newPage < 1 || newPage > totalPages) {
+    return;
+  }
+
+  const startIndex =
+    (newPage - 1) * studentPageSize;
+
+  const endIndex =
+    startIndex + studentPageSize;
+
+  const pageStudents = allFAStudents.slice(
+    startIndex,
+    endIndex
+  );
+
+  setFAStudents(pageStudents);
+
+  setStudentPage(newPage);
+
+  setStudentPagination({
+    page: newPage,
+    pageSize: studentPageSize,
+    count: allFAStudents.length,
+    totalRecords: allFAStudents.length,
+    totalPages,
+  });
+};
+
+
 
   const fetchStaff = async () => {
     try {
@@ -99,20 +319,48 @@ export default function StaffManagement({ currentUser }) {
     // Delete functionality will be added next
   };
 
-  const designationOptions = [
+// =====================================================
+// DESIGNATION DROPDOWN
+// =====================================================
+
+const designationOptions = [
   ...new Set(
     staff
       .map((member) => member.designation)
       .filter(Boolean)
   ),
-].sort();
+].sort((a, b) => {
+  const orderA = getDesignationOrder(a);
+  const orderB = getDesignationOrder(b);
 
-const filteredStaff = staff.filter((member) => {
-  const matchesDesignation =
-    designation === "" || member.designation === designation;
+  if (orderA !== orderB) {
+    return orderA - orderB;
+  }
 
-  return matchesDesignation;
+  // Alphabetical only for "Others"
+  return String(a).localeCompare(String(b));
 });
+// =====================================================
+// FILTER + SORT
+// =====================================================
+
+const filteredStaff = staff
+  .filter((member) => {
+    const matchesDesignation =
+      designation === "" ||
+      normalizeDesignation(member.designation) ===
+        normalizeDesignation(designation);
+
+    return matchesDesignation;
+  })
+  .sort((a, b) => {
+    return (
+      getDesignationOrder(a.designation) -
+      getDesignationOrder(b.designation)
+    );
+  });
+
+
 
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-8 md:px-10">
@@ -380,7 +628,17 @@ const filteredStaff = staff.filter((member) => {
       )}
       </>
     ) : (
-      <FAManagement />
+   <FAManagement
+  onFAClick={handleFAClick}
+  onCloseStudents={handleCloseStudents}
+  selectedFA={selectedFA}
+  faStudents={faStudents}
+  studentsLoading={studentsLoading}
+  studentsError={studentsError}
+  studentPage={studentPage}
+  studentPagination={studentPagination}
+  onStudentPageChange={handleStudentPageChange}
+/>
     )}
     </div>
     </div>

@@ -5,6 +5,7 @@ import {
   Mail,
   Phone,
   Briefcase,
+  Globe,
 } from "lucide-react";
 import { getStaffDetails } from "../../api/staff.api";
 
@@ -205,6 +206,33 @@ export default function StaffDetailsModal({ staffId, onClose }) {
                   </p>
                 </div>
               </div>
+
+              {/* Website */}
+              {staff.staff_web_page && (
+                <div className="rounded-xl bg-slate-50 p-5 md:col-span-2">
+                  <div className="flex items-center gap-3">
+                    <Globe
+                      size={20}
+                      className="text-blue-600"
+                    />
+
+                    <div>
+                      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                        Website
+                      </p>
+
+                      <a
+                        href={staff.staff_web_page}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 inline-block break-all font-semibold text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        Website
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div className="py-10 text-center text-sm text-slate-500">
