@@ -8,8 +8,7 @@ import {
   Eye,
   Pencil,
   Trash2,
-  FolderKanban,
-  ClipboardList
+  ClipboardList,
 } from "lucide-react";
 import { getStaffList, getGuestFacultyList } from "../api/staff.api.js";
 import StaffDetailsModal from "../components/staff/StaffDetailsModal.jsx";
@@ -21,6 +20,7 @@ export default function StaffManagement({ currentUser, onLogout }) {
   const [guestFaculty, setGuestFaculty] = useState([]);
   const [guestFacultyLoading, setGuestFacultyLoading] = useState(false);
   const [guestFacultyError, setGuestFacultyError] = useState("");
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -38,7 +38,6 @@ export default function StaffManagement({ currentUser, onLogout }) {
   const [designation, setDesignation] = useState("");
 
   const [selectedStaffId, setSelectedStaffId] = useState(null);
-
   const [selectedProjectStaff, setSelectedProjectStaff] = useState(null);
 
   const [pagination, setPagination] = useState({
@@ -46,16 +45,21 @@ export default function StaffManagement({ currentUser, onLogout }) {
     pageSize: 10,
     count: 0,
   });
+
   const [activeTab, setActiveTab] = useState("staff");
+
   const isAdmin = currentUser?.role === "admin";
 
+  // FA students pagination
   const [studentPage, setStudentPage] = useState(1);
-  const studentPageSize = 10;
+  const [studentPageSize, setStudentPageSize] = useState(10);
 
   const [studentPagination, setStudentPagination] = useState({
     page: 1,
     pageSize: 10,
     count: 0,
+    totalRecords: 0,
+    totalPages: 0,
   });
 
   const handleCloseStudents = () => {
@@ -64,10 +68,11 @@ export default function StaffManagement({ currentUser, onLogout }) {
     setAllFAStudents([]);
     setStudentsError("");
     setStudentPage(1);
+    setStudentPageSize(10);
 
     setStudentPagination({
       page: 1,
-      pageSize: studentPageSize,
+      pageSize: 10,
       count: 0,
       totalRecords: 0,
       totalPages: 0,
@@ -93,76 +98,14 @@ export default function StaffManagement({ currentUser, onLogout }) {
       .toLowerCase();
   };
 
-  const getDesignationOrder = (designation) => {
-    const normalized = normalizeDesignation(designation);
-
+  const getDesignationOrder = (value) => {
+    const normalized = normalizeDesignation(value);
     return designationOrder[normalized] ?? 999;
   };
 
-  const sortStaffByDesignation = (staffList) => {
-    return [...staffList].sort((a, b) => {
-      const orderA = getDesignationOrder(a.designation);
-      const orderB = getDesignationOrder(b.designation);
-
-      return orderA - orderB;
-    });
-  };
-
-  //   const handleFAClick = async (fa) => {
-  //   try {
-  //     setSelectedFA(fa);
-  //     setStudentsLoading(true);
-  //     setStudentsError("");
-  //     setStudentPage(1);
-
-  //     const response = await studentApi.getStudents({
-  //       faId: fa.faId,
-  //     });
-
-  //     console.log("All students for FA:", response);
-
-  //     const students = Array.isArray(response)
-  //       ? response
-  //       : Array.isArray(response?.data)
-  //       ? response.data
-  //       : [];
-
-  //     // Store ALL students
-  //     setAllFAStudents(students);
-
-  //     // Show only first 10 students
-  //     setFAStudents(students.slice(0, studentPageSize));
-
-  //     // Calculate frontend pagination
-  //     const totalRecords = students.length;
-  //     const totalPages = Math.ceil(
-  //       totalRecords / studentPageSize
-  //     );
-
-  //     setStudentPagination({
-  //       page: 1,
-  //       pageSize: studentPageSize,
-  //       count: totalRecords,
-  //       totalRecords,
-  //       totalPages,
-  //     });
-
-  //   } catch (err) {
-  //     console.error("Error fetching FA students:", err);
-
-  //     setStudentsError(
-  //       err?.response?.data?.message ||
-  //         err?.message ||
-  //         "Failed to load students."
-  //     );
-
-  //     setFAStudents([]);
-  //     setAllFAStudents([]);
-
-  //   } finally {
-  //     setStudentsLoading(false);
-  //   }
-  // };
+  // =====================================================
+  // FETCH STUDENTS UNDER FACULTY ADVISOR
+  // =====================================================
 
   const handleFAClick = async (fa) => {
     try {
@@ -170,11 +113,12 @@ export default function StaffManagement({ currentUser, onLogout }) {
       setStudentsLoading(true);
       setStudentsError("");
       setStudentPage(1);
+      setStudentPageSize(10);
 
       const response = await studentApi.getFAStudents(
         fa.faId,
         fa.year_number,
-        fa.branchid,
+        fa.branchid
       );
 
       console.log("FA students response:", response);
@@ -185,20 +129,20 @@ export default function StaffManagement({ currentUser, onLogout }) {
           ? response.data
           : [];
 
-      // These students are already filtered by:
-      // FA + Year + Branch
       setAllFAStudents(students);
 
-      // First 10 students
-      setFAStudents(students.slice(0, studentPageSize));
-
+      const initialPageSize = 10;
       const totalRecords = students.length;
+      const totalPages = Math.max(
+        1,
+        Math.ceil(totalRecords / initialPageSize)
+      );
 
-      const totalPages = Math.ceil(totalRecords / studentPageSize);
+      setFAStudents(students.slice(0, initialPageSize));
 
       setStudentPagination({
         page: 1,
-        pageSize: studentPageSize,
+        pageSize: initialPageSize,
         count: totalRecords,
         totalRecords,
         totalPages,
@@ -209,41 +153,90 @@ export default function StaffManagement({ currentUser, onLogout }) {
       setStudentsError(
         err?.response?.data?.message ||
           err?.message ||
-          "Failed to load students.",
+          "Failed to load students."
       );
 
       setFAStudents([]);
       setAllFAStudents([]);
+
+      setStudentPagination({
+        page: 1,
+        pageSize: 10,
+        count: 0,
+        totalRecords: 0,
+        totalPages: 0,
+      });
     } finally {
       setStudentsLoading(false);
     }
   };
 
+  // =====================================================
+  // CHANGE FA STUDENT PAGE
+  // =====================================================
+
   const handleStudentPageChange = (newPage) => {
-    const totalPages = Math.ceil(allFAStudents.length / studentPageSize);
+    const currentSize =
+      Number(studentPagination?.pageSize || studentPageSize || 10);
+
+    const totalRecords = allFAStudents.length;
+    const totalPages = Math.max(
+      1,
+      Math.ceil(totalRecords / currentSize)
+    );
 
     if (newPage < 1 || newPage > totalPages) {
       return;
     }
 
-    const startIndex = (newPage - 1) * studentPageSize;
-
-    const endIndex = startIndex + studentPageSize;
+    const startIndex = (newPage - 1) * currentSize;
+    const endIndex = startIndex + currentSize;
 
     const pageStudents = allFAStudents.slice(startIndex, endIndex);
 
     setFAStudents(pageStudents);
-
     setStudentPage(newPage);
 
     setStudentPagination({
       page: newPage,
-      pageSize: studentPageSize,
-      count: allFAStudents.length,
-      totalRecords: allFAStudents.length,
+      pageSize: currentSize,
+      count: totalRecords,
+      totalRecords,
       totalPages,
     });
   };
+
+  // =====================================================
+  // CHANGE FA STUDENTS ROWS PER PAGE
+  // =====================================================
+
+  const handleStudentPageSizeChange = (newPageSize) => {
+    const size = Number(newPageSize) || 10;
+
+    const totalRecords = allFAStudents.length;
+    const totalPages = Math.max(
+      1,
+      Math.ceil(totalRecords / size)
+    );
+
+    setStudentPageSize(size);
+    setStudentPage(1);
+
+    // Reset to first page with selected row count
+    setFAStudents(allFAStudents.slice(0, size));
+
+    setStudentPagination({
+      page: 1,
+      pageSize: size,
+      count: totalRecords,
+      totalRecords,
+      totalPages,
+    });
+  };
+
+  // =====================================================
+  // FETCH STAFF
+  // =====================================================
 
   const fetchStaff = async () => {
     try {
@@ -271,15 +264,15 @@ export default function StaffManagement({ currentUser, onLogout }) {
           page,
           pageSize,
           count: staffData.length,
-        },
+        }
       );
     } catch (err) {
       console.error("Error fetching staff:", err);
 
       setError(
-        err?.message ||
-          err?.response?.data?.message ||
-          "Failed to load staff details.",
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to load staff details."
       );
 
       setStaff([]);
@@ -288,12 +281,17 @@ export default function StaffManagement({ currentUser, onLogout }) {
     }
   };
 
+  // =====================================================
+  // FETCH GUEST FACULTY
+  // =====================================================
+
   const fetchGuestFaculty = async () => {
     try {
       setGuestFacultyLoading(true);
       setGuestFacultyError("");
 
       const response = await getGuestFacultyList();
+
       const data = Array.isArray(response)
         ? response
         : Array.isArray(response?.data)
@@ -303,11 +301,13 @@ export default function StaffManagement({ currentUser, onLogout }) {
       setGuestFaculty(data);
     } catch (err) {
       console.error("Error fetching guest faculty:", err);
+
       setGuestFacultyError(
         err?.response?.data?.message ||
           err?.message ||
           "Failed to load guest faculty details."
       );
+
       setGuestFaculty([]);
     } finally {
       setGuestFacultyLoading(false);
@@ -319,7 +319,10 @@ export default function StaffManagement({ currentUser, onLogout }) {
   }, [page, search]);
 
   useEffect(() => {
-    if (activeTab === "guestFaculty" && guestFaculty.length === 0) {
+    if (
+      activeTab === "guestFaculty" &&
+      guestFaculty.length === 0
+    ) {
       fetchGuestFaculty();
     }
   }, [activeTab]);
@@ -334,12 +337,10 @@ export default function StaffManagement({ currentUser, onLogout }) {
 
   const handleEdit = (staffId) => {
     console.log("Edit staff:", staffId);
-    // Edit functionality will be added next
   };
 
   const handleDelete = (staffId) => {
     console.log("Delete staff:", staffId);
-    // Delete functionality will be added next
   };
 
   // =====================================================
@@ -347,7 +348,11 @@ export default function StaffManagement({ currentUser, onLogout }) {
   // =====================================================
 
   const designationOptions = [
-    ...new Set(staff.map((member) => member.designation).filter(Boolean)),
+    ...new Set(
+      staff
+        .map((member) => member.designation)
+        .filter(Boolean)
+    ),
   ].sort((a, b) => {
     const orderA = getDesignationOrder(a);
     const orderB = getDesignationOrder(b);
@@ -356,11 +361,11 @@ export default function StaffManagement({ currentUser, onLogout }) {
       return orderA - orderB;
     }
 
-    // Alphabetical only for "Others"
     return String(a).localeCompare(String(b));
   });
+
   // =====================================================
-  // FILTER + SORT
+  // FILTER STAFF
   // =====================================================
 
   const filteredStaff = staff
@@ -374,85 +379,88 @@ export default function StaffManagement({ currentUser, onLogout }) {
     })
     .sort((a, b) => {
       return (
-        getDesignationOrder(a.designation) - getDesignationOrder(b.designation)
+        getDesignationOrder(a.designation) -
+        getDesignationOrder(b.designation)
       );
     });
 
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-8 md:px-10">
       <div className="mx-auto max-w-7xl">
+
         {/* Header */}
-<div className="mb-8 flex items-center justify-between">
-  <div className="flex items-center gap-3">
-    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
-      <Users size={25} />
-    </div>
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+              <Users size={25} />
+            </div>
 
-    <div>
-      <h1 className="text-2xl font-bold text-slate-900">
-        Staff Management
-      </h1>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">
+                Staff Management
+              </h1>
 
-      <p className="mt-1 text-sm text-slate-500">
-        View faculty and staff information
-      </p>
-    </div>
-  </div>
+              <p className="mt-1 text-sm text-slate-500">
+                View faculty and staff information
+              </p>
+            </div>
+          </div>
 
-  {/* Logout */}
-  <button
-    type="button"
-    onClick={onLogout}
-    className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
-  >
-    Logout
-  </button>
-</div>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+          >
+            Logout
+          </button>
+        </div>
+
         {/* Tabs */}
         <div className="mb-6 flex gap-3">
           <button
+            type="button"
             onClick={() => setActiveTab("staff")}
-            className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition
-              ${
-                activeTab === "staff"
-                  ? "bg-blue-600 text-white shadow"
-                  : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
-              }`}
+            className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition ${
+              activeTab === "staff"
+                ? "bg-blue-600 text-white shadow"
+                : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
+            }`}
           >
             Staff
           </button>
 
           <button
+            type="button"
             onClick={() => setActiveTab("fa")}
-            className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition
-              ${
-                activeTab === "fa"
-                  ? "bg-blue-600 text-white shadow"
-                  : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
-              }`}
+            className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition ${
+              activeTab === "fa"
+                ? "bg-blue-600 text-white shadow"
+                : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
+            }`}
           >
             FA
           </button>
 
           <button
+            type="button"
             onClick={() => setActiveTab("guestFaculty")}
-            className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition
-              ${
-                activeTab === "guestFaculty"
-                  ? "bg-blue-600 text-white shadow"
-                  : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
-              }`}
+            className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition ${
+              activeTab === "guestFaculty"
+                ? "bg-blue-600 text-white shadow"
+                : "border border-slate-300 bg-white text-slate-600 hover:bg-slate-100"
+            }`}
           >
             Guest Faculty
           </button>
         </div>
+
+        {/* STAFF TAB */}
         {activeTab === "staff" ? (
           <>
-            {/* Search */}
+            {/* Search and Filter */}
             <div className="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex items-center justify-between gap-4">
-                {/* Search Box */}
-                <div className="relative flex-1 max-w-md">
+                <div className="relative max-w-md flex-1">
                   <Search
                     size={19}
                     className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -467,7 +475,6 @@ export default function StaffManagement({ currentUser, onLogout }) {
                   />
                 </div>
 
-                {/* Designation Filter */}
                 <select
                   value={designation}
                   onChange={(e) => setDesignation(e.target.value)}
@@ -491,7 +498,7 @@ export default function StaffManagement({ currentUser, onLogout }) {
               </div>
             )}
 
-            {/* Table */}
+            {/* Staff Table */}
             <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="overflow-x-auto">
                 <table className="min-w-full">
@@ -578,7 +585,6 @@ export default function StaffManagement({ currentUser, onLogout }) {
 
                           <td className="px-6 py-4">
                             <div className="flex items-center justify-center gap-2">
-                              {/* View - both HOD and Admin */}
                               <button
                                 type="button"
                                 onClick={() =>
@@ -600,16 +606,17 @@ export default function StaffManagement({ currentUser, onLogout }) {
                                 }
                                 className="inline-flex items-center gap-2 rounded-lg border border-purple-200 px-3 py-2 text-sm font-medium text-purple-600 transition hover:bg-purple-50"
                               >
-                                <ClipboardList size={16}/>
-
+                                <ClipboardList size={16} />
                                 Project
                               </button>
-                              {/* Edit/Delete - Admin only */}
+
                               {isAdmin && (
                                 <>
                                   <button
                                     type="button"
-                                    onClick={() => handleEdit(member.staffid)}
+                                    onClick={() =>
+                                      handleEdit(member.staffid)
+                                    }
                                     className="inline-flex items-center justify-center rounded-lg border border-amber-200 p-2 text-amber-600 transition hover:bg-amber-50"
                                     title="Edit staff"
                                   >
@@ -618,7 +625,9 @@ export default function StaffManagement({ currentUser, onLogout }) {
 
                                   <button
                                     type="button"
-                                    onClick={() => handleDelete(member.staffid)}
+                                    onClick={() =>
+                                      handleDelete(member.staffid)
+                                    }
                                     className="inline-flex items-center justify-center rounded-lg border border-red-200 p-2 text-red-600 transition hover:bg-red-50"
                                     title="Delete staff"
                                   >
@@ -635,9 +644,11 @@ export default function StaffManagement({ currentUser, onLogout }) {
                 </table>
               </div>
 
-              {/* Pagination */}
+              {/* Staff Pagination */}
               <div className="flex items-center justify-between border-t border-slate-200 px-6 py-4">
-                <p className="text-sm text-slate-500">Page {pagination.page}</p>
+                <p className="text-sm text-slate-500">
+                  Page {pagination.page}
+                </p>
 
                 <div className="flex items-center gap-2">
                   <button
@@ -663,7 +674,6 @@ export default function StaffManagement({ currentUser, onLogout }) {
               </div>
             </div>
 
-            {/* Staff Details Modal */}
             {selectedStaffId && (
               <StaffDetailsModal
                 staffId={selectedStaffId}
@@ -690,73 +700,126 @@ export default function StaffManagement({ currentUser, onLogout }) {
             studentPage={studentPage}
             studentPagination={studentPagination}
             onStudentPageChange={handleStudentPageChange}
+            onStudentPageSizeChange={handleStudentPageSizeChange}
           />
         ) : (
+          // GUEST FACULTY TAB
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
             {guestFacultyError && (
               <div className="m-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
                 {guestFacultyError}
               </div>
             )}
+
             <div className="overflow-x-auto">
               <table className="min-w-full">
                 <thead className="border-b border-slate-200 bg-slate-50">
                   <tr>
-                    {['Staff Code', 'Staff Name', 'Email', 'Mobile', 'Action'].map((heading) => (
-                      <th key={heading} className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">{heading}</th>
+                    {[
+                      "Staff Code",
+                      "Staff Name",
+                      "Email",
+                      "Mobile",
+                      "Action",
+                    ].map((heading) => (
+                      <th
+                        key={heading}
+                        className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                      >
+                        {heading}
+                      </th>
                     ))}
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-slate-100">
                   {guestFacultyLoading ? (
-                    <tr><td colSpan={5} className="px-6 py-12 text-center text-sm text-slate-500">Loading guest faculty details...</td></tr>
-                  ) : guestFaculty.length === 0 ? (
-                    <tr><td colSpan={5} className="px-6 py-12 text-center text-sm text-slate-500">No guest faculty records found.</td></tr>
-                  ) : guestFaculty.map((member) => (
-                    <tr key={member.staffid} className="transition hover:bg-slate-50">
-                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-700">{member.staffcode || "-"}</td>
-                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">{member.staffname || "-"}</td>
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">{member.emailid || "-"}</td>
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">{member.mobileno || "-"}</td>
-                      <td className="px-6 py-4"><div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedStaffId(member.staffid)}
-                          className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
-                        >
-                          <Eye size={16} />
-                          View
-                        </button>
-
-                        {isAdmin && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => handleEdit(member.staffid)}
-                              className="inline-flex items-center justify-center rounded-lg border border-amber-200 p-2 text-amber-600 transition hover:bg-amber-50"
-                              title="Edit staff"
-                            >
-                              <Pencil size={16} />
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => handleDelete(member.staffid)}
-                              className="inline-flex items-center justify-center rounded-lg border border-red-200 p-2 text-red-600 transition hover:bg-red-50"
-                              title="Delete staff"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </>
-                        )}
-                      </div></td>
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="px-6 py-12 text-center text-sm text-slate-500"
+                      >
+                        Loading guest faculty details...
+                      </td>
                     </tr>
-                  ))}
+                  ) : guestFaculty.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={5}
+                        className="px-6 py-12 text-center text-sm text-slate-500"
+                      >
+                        No guest faculty records found.
+                      </td>
+                    </tr>
+                  ) : (
+                    guestFaculty.map((member) => (
+                      <tr
+                        key={member.staffid}
+                        className="transition hover:bg-slate-50"
+                      >
+                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-700">
+                          {member.staffcode || "-"}
+                        </td>
+
+                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-900">
+                          {member.staffname || "-"}
+                        </td>
+
+                        <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
+                          {member.emailid || "-"}
+                        </td>
+
+                        <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
+                          {member.mobileno || "-"}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setSelectedStaffId(member.staffid)
+                              }
+                              className="inline-flex items-center gap-2 rounded-lg border border-blue-200 px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
+                            >
+                              <Eye size={16} />
+                              View
+                            </button>
+
+                            {isAdmin && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleEdit(member.staffid)
+                                  }
+                                  className="inline-flex items-center justify-center rounded-lg border border-amber-200 p-2 text-amber-600 transition hover:bg-amber-50"
+                                  title="Edit staff"
+                                >
+                                  <Pencil size={16} />
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    handleDelete(member.staffid)
+                                  }
+                                  className="inline-flex items-center justify-center rounded-lg border border-red-200 p-2 text-red-600 transition hover:bg-red-50"
+                                  title="Delete staff"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
 
-            {/* Guest Faculty Details Modal */}
             {selectedStaffId && (
               <StaffDetailsModal
                 staffId={selectedStaffId}
