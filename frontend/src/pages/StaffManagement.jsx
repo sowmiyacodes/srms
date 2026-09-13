@@ -1,4 +1,4 @@
-import { studentApi } from "../api/student.api";
+import { studentApi } from "../api/student.api.js";
 import React, { useEffect, useState } from "react";
 import {
   Search,
