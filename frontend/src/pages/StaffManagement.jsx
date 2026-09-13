@@ -16,7 +16,7 @@ import StaffDetailsModal from "../components/staff/StaffDetailsModal.jsx";
 import FAManagement from "../components/staff/FAManagement.jsx";
 import ProjectStudentsModal from "../components/staff/ProjectStudentsModal.jsx";
 
-export default function StaffManagement({ currentUser }) {
+export default function StaffManagement({ currentUser, onLogout }) {
   const [staff, setStaff] = useState([]);
   const [guestFaculty, setGuestFaculty] = useState([]);
   const [guestFacultyLoading, setGuestFacultyLoading] = useState(false);
@@ -382,23 +382,32 @@ export default function StaffManagement({ currentUser }) {
     <div className="min-h-screen bg-slate-50 px-6 py-8 md:px-10">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
-              <Users size={25} />
-            </div>
+<div className="mb-8 flex items-center justify-between">
+  <div className="flex items-center gap-3">
+    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+      <Users size={25} />
+    </div>
 
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">
-                Staff Management
-              </h1>
+    <div>
+      <h1 className="text-2xl font-bold text-slate-900">
+        Staff Management
+      </h1>
 
-              <p className="mt-1 text-sm text-slate-500">
-                View faculty and staff information
-              </p>
-            </div>
-          </div>
-        </div>
+      <p className="mt-1 text-sm text-slate-500">
+        View faculty and staff information
+      </p>
+    </div>
+  </div>
+
+  {/* Logout */}
+  <button
+    type="button"
+    onClick={onLogout}
+    className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+  >
+    Logout
+  </button>
+</div>
         {/* Tabs */}
         <div className="mb-6 flex gap-3">
           <button
