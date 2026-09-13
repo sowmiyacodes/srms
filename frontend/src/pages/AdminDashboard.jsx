@@ -5,18 +5,18 @@ import {
   Bus
 } from 'lucide-react';
 
-import { studentApi } from '../api/student.api';
-import useDebounce from '../hooks/useDebounce';
+import { studentApi } from '../api/student.api.js';
+import useDebounce from '../hooks/useDebounce.js';
 
-import DashboardHeader from '../components/layout/DashboardHeader';
-import StatCard from '../components/dashboard/StatCard';
-import StudentFilters from '../components/students/StudentFilters';
-import StudentTable from '../components/students/StudentTable';
-import StudentModal from '../components/students/StudentModal';
-import Pagination from '../components/students/Pagination';
-import Spinner from '../components/common/Spinner';
-import EmptyState from '../components/common/EmptyState';
-import Toast from '../components/common/Toast';
+import DashboardHeader from '../components/layout/DashboardHeader.jsx';
+import StatCard from '../components/dashboard/StatCard.jsx';
+import StudentFilters from '../components/students/StudentFilters.jsx';
+import StudentTable from '../components/students/StudentTable.jsx';
+import StudentModal from '../components/students/StudentModal.jsx';
+import Pagination from '../components/students/Pagination.jsx';
+import Spinner from '../components/common/Spinner.jsx';
+import EmptyState from '../components/common/EmptyState.jsx';
+import Toast from '../components/common/Toast.jsx';
  
 const DEFAULT_FILTERS = {
   search: '',
