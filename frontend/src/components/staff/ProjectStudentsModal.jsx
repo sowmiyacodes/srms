@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+  import React, { useEffect, useMemo, useState } from "react";
 import {
   X,
   GraduationCap,
@@ -7,7 +7,6 @@ import {
 } from "lucide-react";
 
 import { getProjectStudentsByStaff } from "../../api/staff.api";
-
 export default function ProjectStudentsModal({
   staffId,
   staffName,
