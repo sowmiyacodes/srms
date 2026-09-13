@@ -172,6 +172,7 @@ const handleBackToLogin = () => {
     isManagementUser ? (
       <StaffManagement
         currentUser={currentUser}
+        onLogout={() => handleLogout("/hodlogin")}
       />
     ) : (
       <Navigate to="/hodlogin" replace />
