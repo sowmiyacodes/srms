@@ -6,13 +6,13 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import LandingPage from "./pages/LandingPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import AdminDashboard from "./pages/AdminDashboard";
-import StaffDashboard from "./pages/StaffDashboard";
-import HODHomePage from "./pages/HODHomePage";
-import StaffManagement from "./pages/StaffManagement";
+import LandingPage from "./pages/LandingPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import StaffDashboard from "./pages/StaffDashboard.jsx";
+import HODHomePage from "./pages/HODHomePage.jsx";
+import StaffManagement from "./pages/StaffManagement.jsx";
 
 export default function App() {
   const navigate = useNavigate();

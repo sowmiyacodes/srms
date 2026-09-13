@@ -11,10 +11,10 @@ import {
   FolderKanban,
   ClipboardList
 } from "lucide-react";
-import { getStaffList, getGuestFacultyList } from "../api/staff.api";
-import StaffDetailsModal from "../components/staff/StaffDetailsModal";
-import FAManagement from "../components/staff/FAManagement";
-import ProjectStudentsModal from "../components/staff/ProjectStudentsModal";
+import { getStaffList, getGuestFacultyList } from "../api/staff.api.js";
+import StaffDetailsModal from "../components/staff/StaffDetailsModal.jsx";
+import FAManagement from "../components/staff/FAManagement.jsx";
+import ProjectStudentsModal from "../components/staff/ProjectStudentsModal.jsx";
 
 export default function StaffManagement({ currentUser }) {
   const [staff, setStaff] = useState([]);
