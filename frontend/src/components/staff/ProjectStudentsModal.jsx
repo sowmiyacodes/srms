@@ -71,33 +71,17 @@ export default function ProjectStudentsModal({
     }, {});
   }, [students]);
 
-  // Desired batch display order
-  const batchOrder = [
+  // Required three columns
+  const batchColumns = [
     "IT Batch A",
     "IT Batch B",
     "AIDS",
   ];
 
-  const sortedBatches = Object.keys(
-    groupedStudents
-  ).sort((a, b) => {
-    const aIndex = batchOrder.indexOf(a);
-    const bIndex = batchOrder.indexOf(b);
-
-    if (aIndex === -1 && bIndex === -1) {
-      return a.localeCompare(b);
-    }
-
-    if (aIndex === -1) {
-      return 1;
-    }
-
-    if (bIndex === -1) {
-      return -1;
-    }
-
-    return aIndex - bIndex;
-  });
+  // Keep unexpected batches visible
+  const otherBatches = Object.keys(groupedStudents).filter(
+    (batch) => !batchColumns.includes(batch)
+  );
 
   return (
     <div
@@ -105,7 +89,7 @@ export default function ProjectStudentsModal({
       onClick={onClose}
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -180,73 +164,130 @@ export default function ProjectStudentsModal({
               </div>
             )}
 
-          {/* Students grouped by batch */}
+          {/* Three batch columns */}
           {!loading &&
             !error &&
             students.length > 0 && (
-              <div className="space-y-8">
-                {sortedBatches.map((batch) => (
-                  <div key={batch}>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
 
-                    {/* Batch heading */}
-                    <div className="mb-3 flex items-center gap-3">
-                      <h3 className="text-base font-bold text-slate-800">
-                        {batch}
-                      </h3>
+                {batchColumns.map((batch) => {
+                  const batchStudents =
+                    groupedStudents[batch] || [];
 
-                      <span className="rounded-full bg-purple-100 px-2.5 py-1 text-xs font-semibold text-purple-700">
-                        {groupedStudents[batch].length} students
-                      </span>
-                    </div>
+                  return (
+                    <div
+                      key={batch}
+                      className="overflow-hidden rounded-xl border border-slate-200"
+                    >
+                      {/* Batch Header */}
+                      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-3">
+                        <h3 className="text-sm font-bold text-slate-800">
+                          {batch}
+                        </h3>
 
-                    {/* Table */}
-                    <div className="overflow-hidden rounded-xl border border-slate-200">
-                      <table className="min-w-full">
-                        <thead className="border-b border-slate-200 bg-slate-50">
-                          <tr>
-                            <th className="w-16 px-5 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
-                              #
-                            </th>
+                        <span className="rounded-full bg-purple-100 px-2.5 py-1 text-xs font-semibold text-purple-700">
+                          {batchStudents.length}
+                        </span>
+                      </div>
 
-                            <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                              Register Number
-                            </th>
-
-                            <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                              Student Name
-                            </th>
-                          </tr>
-                        </thead>
-
-                        <tbody className="divide-y divide-slate-100">
-                          {groupedStudents[batch].map(
+                      {/* Students */}
+                      <div className="divide-y divide-slate-100">
+                        {batchStudents.length > 0 ? (
+                          batchStudents.map(
                             (student, index) => (
-                              <tr
+                              <div
                                 key={
                                   student.id ??
                                   `${student.student_reg_no}-${batch}`
                                 }
-                                className="transition hover:bg-slate-50"
+                                className="flex items-start gap-3 px-4 py-3 transition hover:bg-slate-50"
                               >
-                                <td className="px-5 py-3 text-center text-sm text-slate-500">
-                                  {index + 1}
-                                </td>
+                                {/* Number */}
+                                <span className="w-5 shrink-0 pt-0.5 text-xs font-semibold text-slate-400">
+                                  {index + 1}.
+                                </span>
 
-                                <td className="px-5 py-3 text-sm font-medium text-slate-800">
-                                  {student.student_reg_no || "-"}
-                                </td>
+                                {/* Student Details */}
+                                <div className="min-w-0">
+                                  <p className="text-sm font-semibold text-slate-800">
+                                    {student.student_reg_no || "-"}
+                                  </p>
 
-                                <td className="px-5 py-3 text-sm text-slate-700">
-                                  {student.student_name || "-"}
-                                </td>
-                              </tr>
+                                  <p className="mt-0.5 break-words text-sm text-slate-600">
+                                    {student.student_name || "-"}
+                                  </p>
+                                </div>
+                              </div>
                             )
-                          )}
-                        </tbody>
-                      </table>
+                          )
+                        ) : (
+                          <div className="px-4 py-8 text-center text-sm text-slate-400">
+                            No students
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+              </div>
+            )}
+
+          {/* Unexpected batches */}
+          {!loading &&
+            !error &&
+            otherBatches.length > 0 && (
+              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+
+                <p className="text-sm font-semibold text-amber-800">
+                  Other batches
+                </p>
+
+                <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {otherBatches.map((batch) => (
+                    <div
+                      key={batch}
+                      className="rounded-lg border border-amber-200 bg-white"
+                    >
+                      <div className="flex items-center justify-between border-b border-amber-100 px-4 py-2.5">
+                        <span className="text-sm font-semibold text-slate-800">
+                          {batch}
+                        </span>
+
+                        <span className="text-xs font-semibold text-amber-700">
+                          {groupedStudents[batch].length}
+                        </span>
+                      </div>
+
+                      <div className="divide-y divide-slate-100">
+                        {groupedStudents[batch].map(
+                          (student, index) => (
+                            <div
+                              key={
+                                student.id ??
+                                `${student.student_reg_no}-${batch}`
+                              }
+                              className="flex items-start gap-3 px-4 py-3"
+                            >
+                              <span className="w-5 shrink-0 text-xs font-semibold text-slate-400">
+                                {index + 1}.
+                              </span>
+
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold text-slate-800">
+                                  {student.student_reg_no || "-"}
+                                </p>
+
+                                <p className="mt-0.5 break-words text-sm text-slate-600">
+                                  {student.student_name || "-"}
+                                </p>
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
         </div>
