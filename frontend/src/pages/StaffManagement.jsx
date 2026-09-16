@@ -238,6 +238,7 @@ export default function StaffManagement({ currentUser, onLogout }) {
   // FETCH STAFF
   // =====================================================
 
+
   const fetchStaff = async () => {
     try {
       setLoading(true);
@@ -245,6 +246,7 @@ export default function StaffManagement({ currentUser, onLogout }) {
 
       const response = await getStaffList({
         search: search.trim(),
+        designation: designation || undefined,
         page,
         pageSize,
       });
@@ -281,6 +283,7 @@ export default function StaffManagement({ currentUser, onLogout }) {
     }
   };
 
+
   // =====================================================
   // FETCH GUEST FACULTY
   // =====================================================
@@ -316,7 +319,7 @@ export default function StaffManagement({ currentUser, onLogout }) {
 
   useEffect(() => {
     fetchStaff();
-  }, [page, search]);
+  }, [page, search,designation]);
 
   useEffect(() => {
     if (
@@ -368,21 +371,21 @@ export default function StaffManagement({ currentUser, onLogout }) {
   // FILTER STAFF
   // =====================================================
 
-  const filteredStaff = staff
-    .filter((member) => {
-      const matchesDesignation =
-        designation === "" ||
-        normalizeDesignation(member.designation) ===
-          normalizeDesignation(designation);
+  // const filteredStaff = staff
+  //   .filter((member) => {
+  //     const matchesDesignation =
+  //       designation === "" ||
+  //       normalizeDesignation(member.designation) ===
+  //         normalizeDesignation(designation);
 
-      return matchesDesignation;
-    })
-    .sort((a, b) => {
-      return (
-        getDesignationOrder(a.designation) -
-        getDesignationOrder(b.designation)
-      );
-    });
+  //     return matchesDesignation;
+  //   })
+  //   .sort((a, b) => {
+  //     return (
+  //       getDesignationOrder(a.designation) -
+  //       getDesignationOrder(b.designation)
+  //     );
+  //   });
 
   return (
     <div className="min-h-screen bg-slate-50 px-6 py-8 md:px-10">
@@ -477,7 +480,10 @@ export default function StaffManagement({ currentUser, onLogout }) {
 
                 <select
                   value={designation}
-                  onChange={(e) => setDesignation(e.target.value)}
+                  onChange={(e) => {
+                    setDesignation(e.target.value);
+                    setPage(1);
+                  }}
                   className="w-56 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                 >
                   <option value="">All Designations</option>
@@ -554,7 +560,7 @@ export default function StaffManagement({ currentUser, onLogout }) {
                         </td>
                       </tr>
                     ) : (
-                      filteredStaff.map((member) => (
+                      staff.map((member) => (
                         <tr
                           key={member.staffid}
                           className="transition hover:bg-slate-50"
