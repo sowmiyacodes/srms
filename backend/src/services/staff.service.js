@@ -14,6 +14,10 @@ const {
     buildFAStudentsQuery
 } = require("../queries/staff/faStudentsQuery");
 
+const {
+  buildGuestFacultyListQuery,
+} = require("../queries/staff/guestFacultyListQuery");
+
 const getStaffList = async (filters = {}) => {
   const page = Math.max(parseInt(filters.page, 10) || 1, 1);
 
@@ -58,6 +62,13 @@ const getFAList = async () => {
   return rows;
 };
 
+const getGuestFacultyList = async () => {
+  const rows = await buildGuestFacultyListQuery();
+
+  return rows;
+};
+
+
 const getFAStudents = async (faId, yearNumber, branchId) => {
 
     const students = await buildFAStudentsQuery(
@@ -73,5 +84,6 @@ module.exports = {
   getStaffList,
   getStaffDetails,
   getFAList,
+  getGuestFacultyList,
   getFAStudents,
 };

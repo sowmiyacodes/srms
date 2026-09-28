@@ -9,7 +9,7 @@ import {
   UserCheck,
   Building2,
 } from "lucide-react";
-import { authApi } from "../api/auth.api";
+import { authApi } from "../api/auth.api.js";
 
 export default function LoginPage({
   role,

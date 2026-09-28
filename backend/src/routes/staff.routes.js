@@ -14,6 +14,10 @@ router.get(
   staffController.getFAList
 );
 
+router.get(
+  "/guest-faculty",
+  staffController.getGuestFacultyList
+);
 
 router.get(
     "/fa/:faId/students",

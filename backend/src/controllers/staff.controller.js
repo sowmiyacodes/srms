@@ -54,6 +54,19 @@ async function getFAList(req, res, next) {
   }
 }
 
+async function getGuestFacultyList(req, res, next) {
+  try {
+    const data = await staffService.getGuestFacultyList();
+
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function getProjectStudents(req, res, next) {
   try {
     const { id } = req.params;
@@ -139,6 +152,7 @@ module.exports = {
   getStaffList,
   getStaffDetails,
   getFAList,
+  getGuestFacultyList,
   getProjectStudents,
   getFAStudents,
 };

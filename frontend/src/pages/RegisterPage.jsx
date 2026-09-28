@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Building, ArrowLeft } from 'lucide-react';
-import { authApi } from '../api/auth.api';
+import { authApi } from '../api/auth.api.js';
 
 export default function RegisterPage({ onRegister, onBackToLogin }) {
   const [name, setName] = useState('');

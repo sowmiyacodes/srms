@@ -67,6 +67,7 @@ export default function StaffDetailsModal({ staffId, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
+      
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
           <div>
@@ -79,14 +80,32 @@ export default function StaffDetailsModal({ staffId, onClose }) {
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
-          >
-            <X size={22} />
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Website */}
+            {staff?.staff_web_page && (
+              <a
+                href={staff.staff_web_page}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-blue-600 transition hover:bg-blue-50 hover:text-blue-800"
+              >
+                <Globe size={18} />
+                <span>Website</span>
+              </a>
+            )}
+
+            {/* Close */}
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+            >
+              <X size={22} />
+            </button>
+          </div>
         </div>
+
+
 
         {/* Content */}
         <div className="p-6">
@@ -225,32 +244,7 @@ export default function StaffDetailsModal({ staffId, onClose }) {
                 </div>
               </div>
 
-              {/* Website */}
-              {staff.staff_web_page && (
-                <div className="rounded-xl bg-slate-50 p-5 md:col-span-2">
-                  <div className="flex items-center gap-3">
-                    <Globe
-                      size={20}
-                      className="text-blue-600"
-                    />
 
-                    <div>
-                      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                        Website
-                      </p>
-
-                      <a
-                        href={staff.staff_web_page}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-1 inline-block break-all font-semibold text-blue-600 hover:text-blue-800 hover:underline"
-                      >
-                        Website
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           ) : (
             <div className="py-10 text-center text-sm text-slate-500">

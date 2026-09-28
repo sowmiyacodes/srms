@@ -12,19 +12,21 @@ const buildStaffListQuery = (filters = {}) => {
   const offset = (page - 1) * pageSize;
 
   const query = db("staff as s")
-    .select(
-      "s.staffid",
-      "s.staffcode",
-      "s.staffname",
-      "s.emailid",
-      "s.mobileno",
-      "s.departmentid",
-      "s.designation",
-      "s.staff_web_page"
-    )
-    .orderBy("s.staffname", "asc")
-    .limit(pageSize)
-    .offset(offset);
+  .select(
+    "s.staffid",
+    "s.staffcode",
+    "s.staffname",
+    "s.emailid",
+    "s.mobileno",
+    "s.departmentid",
+    "s.designation",
+    "s.staff_web_page",
+    "s.roles"
+  )
+  .whereNot("s.designation", "Guest Faculty")
+  // .orderBy("s.staffname", "asc")
+  // .limit(pageSize)
+  // .offset(offset);
 
   if (search) {
     query.where(function () {
@@ -42,6 +44,18 @@ const buildStaffListQuery = (filters = {}) => {
     query.where("s.departmentid", departmentid);
   }
 
+  query .orderByRaw(` 
+        CASE 
+          WHEN LOWER(TRIM(s.designation)) = 'professor' THEN 1 
+          WHEN LOWER(TRIM(s.designation)) = 'associate professor' THEN 2 
+          WHEN LOWER(TRIM(s.designation)) = 'assistant professor' THEN 3 
+          WHEN LOWER(TRIM(s.designation)) = 'teaching fellow' THEN 4 
+          ELSE 999 
+          END ASC 
+          `) 
+          .orderBy("s.staffname", "asc") 
+          .limit(pageSize) 
+          .offset(offset);
   return query;
 };
 
