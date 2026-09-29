@@ -82,6 +82,10 @@ const buildFAStudentsQuery = async (faId, yearNumber, branchId) => {
             branchId
         )
 
+        .whereRaw(
+            "SUBSTRING(s.regno, 1, 4) ~ '^[0-9]{4}$'"
+        )
+
         // -----------------------------
         // Exclude Lateral Students
         // Same condition as faListQuery
@@ -98,14 +102,17 @@ const buildFAStudentsQuery = async (faId, yearNumber, branchId) => {
 
         .whereRaw(`
             CASE
-                WHEN EXTRACT(MONTH FROM CURRENT_DATE) > 6
-                THEN
-                    EXTRACT(YEAR FROM CURRENT_DATE)::integer
-                    - SUBSTRING(s.regno, 1, 4)::integer
-                    + 1
-                ELSE
-                    EXTRACT(YEAR FROM CURRENT_DATE)::integer
-                    - SUBSTRING(s.regno, 1, 4)::integer
+                WHEN SUBSTRING(s.regno, 1, 4) ~ '^[0-9]{4}$' THEN
+                    CASE
+                        WHEN EXTRACT(MONTH FROM CURRENT_DATE) > 6
+                        THEN
+                            EXTRACT(YEAR FROM CURRENT_DATE)::integer
+                            - SUBSTRING(s.regno, 1, 4)::integer
+                            + 1
+                        ELSE
+                            EXTRACT(YEAR FROM CURRENT_DATE)::integer
+                            - SUBSTRING(s.regno, 1, 4)::integer
+                    END
             END = ?
         `, [yearNumber])
 
