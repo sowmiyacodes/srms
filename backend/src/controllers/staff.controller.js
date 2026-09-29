@@ -32,7 +32,6 @@ async function getStaffDetails(req, res, next) {
     const { id } = req.params;
 
     const staff = await staffService.getStaffDetails(id);
-
     res.json({
       success: true,
       data: staff,

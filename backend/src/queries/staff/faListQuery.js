@@ -27,17 +27,21 @@ const buildFAListQuery = async () => {
     .select(
       db.raw(`
         CASE
-          WHEN EXTRACT(MONTH FROM CURRENT_DATE) > 6
-          THEN
-            EXTRACT(YEAR FROM CURRENT_DATE)::integer
-            - SUBSTRING(st.regno, 1, 4)::integer
-            + 1
-          ELSE
-            EXTRACT(YEAR FROM CURRENT_DATE)::integer
-            - SUBSTRING(st.regno, 1, 4)::integer
+          WHEN SUBSTRING(st.regno, 1, 4) ~ '^[0-9]{4}$' THEN
+            CASE
+              WHEN EXTRACT(MONTH FROM CURRENT_DATE) > 6
+              THEN
+                EXTRACT(YEAR FROM CURRENT_DATE)::integer
+                - SUBSTRING(st.regno, 1, 4)::integer
+                + 1
+              ELSE
+                EXTRACT(YEAR FROM CURRENT_DATE)::integer
+                - SUBSTRING(st.regno, 1, 4)::integer
+            END
         END AS year_number
       `)
     )
+    .whereRaw("SUBSTRING(st.regno, 1, 4) ~ '^[0-9]{4}$'")
     .whereRaw("SUBSTRING(st.regno, 8, 1) <> '3'");
 
   /*
